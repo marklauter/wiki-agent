@@ -1,5 +1,5 @@
 ---
-name: wiki-review
+name: review-docs
 description: Senior technical editor — reviews wiki pages for structure, clarity, accuracy, and style. Creates GitHub issues for each finding.
 model: sonnet
 allowed-tools: Bash, Read, Grep, Glob, Task, TodoWrite
@@ -9,14 +9,10 @@ Orchestrate a documentation review. Launch reviewer agents to audit wiki pages, 
 
 Audience, tone, writing principles: `CLAUDE.md`.
 
-## Phase 0: Load config
-
-Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/wiki-setup owner/repo` first and stop.
-
 ## Inputs
 
-- `$ARGUMENTS`: wiki page paths (relative to `{wikiDir}/`) and optional `--pass` flag.
-- No files specified → review all pages in `{wikiDir}/_Sidebar.md`.
+- `$ARGUMENTS`: wiki page paths (relative to `DynamoDbLite.wiki/`) and optional `--pass` flag.
+- No files specified → review all pages in `DynamoDbLite.wiki/_Sidebar.md`.
 - No `--pass` flag → run all passes.
 
 ### Passes
@@ -31,9 +27,9 @@ Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`
 
 ## Phase 1: Identify pages
 
-1. Read `{wikiDir}/_Sidebar.md` to discover all wiki pages.
+1. Read `DynamoDbLite.wiki/_Sidebar.md` to discover all wiki pages.
 2. Filter to `$ARGUMENTS` pages or use all.
-3. For each page, identify corresponding source files in `{sourceDir}/`.
+3. For each page, identify corresponding source files in `src/DynamoDbLite/`.
 
 Build `(wiki-page, relevant-source-files)` tuples.
 
@@ -43,7 +39,7 @@ For each wiki page, launch a **background** Task agent (`subagent_type: Explore`
 
 1. Reads the wiki page.
 2. Reads relevant source files to verify accuracy.
-3. Reads `{wikiDir}/_Sidebar.md` to check cross-reference links.
+3. Reads `DynamoDbLite.wiki/_Sidebar.md` to check cross-reference links.
 4. Applies requested pass(es) using editorial standards below.
 5. Returns findings in this format:
 ```
@@ -74,9 +70,22 @@ Omit **Quote**, **Source file**, or **Recommendation** when not applicable.
 
 ### Agent prompt
 
-Include in each agent's prompt: full editorial standards section below, pass(es) to run, wiki page path, relevant source file paths, finding format and example above. Also include the `audience` and `tone` from the config so the agent can evaluate appropriateness.
+Include in each agent's prompt: full editorial standards section below, pass(es) to run, wiki page path, relevant source file paths, finding format and example above.
 
 Launch all agents in parallel (`run_in_background: true`), then collect results.
+
+## Phase 2.5: Deduplicate
+
+Before filing, filter out findings that already have open issues.
+
+1. Run: `gh issue list --repo marklauter/DynamoDbLite --label documentation --state open --limit 200 --json number,title,body`
+2. Build a list of `(issue-number, title, body-snippet)` from the result.
+3. For each finding from Phase 2, check whether an existing open issue covers it:
+   - Title contains the same wiki page name **and** the finding slug or a close paraphrase.
+   - Or the issue body quotes the same text or describes the same problem.
+4. Mark matched findings as **skipped** (with the existing issue number). Remove them from the filing queue.
+
+Err on the side of filing — only skip when the match is clearly the same problem. A finding about a different section of the same page is not a duplicate.
 
 ## Phase 3: Issue filing
 
@@ -85,7 +94,9 @@ Follow `.claude/skills/file-issue/SKILL.md` with `docs.yml` template. Overrides:
 1. Group closely related findings sharing the same root cause into one issue.
 2. Launch Task agents (`subagent_type: general-purpose`, `model: haiku`) in parallel.
 3. Skip confirmation — user authorized filing by invoking the command.
-4. Title: `docs:` prefix, under 70 characters.
+4. Title: under 70 characters, no prefix (the `documentation` label provides categorization).
+5. Label: `documentation` (use `--label documentation` on `gh issue create`).
+6. Only file findings that survived Phase 2.5 deduplication.
 
 ## Phase 4: Summary
 
@@ -93,8 +104,9 @@ Output:
 
 1. **What's strong** — 1-2 sentences on what reviewed pages do well.
 2. **Issues filed** — table: Issue #, Page, Title, Severity, Pass.
-3. **Unverified items** — claims reviewers couldn't confirm against source (no issue filed).
-4. **Clean pages** — pages with no findings.
+3. **Skipped (duplicate)** — table: Existing Issue #, Page, Finding slug, reason matched.
+4. **Unverified items** — claims reviewers couldn't confirm against source (no issue filed).
+5. **Clean pages** — pages with no findings.
 
 ## Editorial standards
 
@@ -119,8 +131,8 @@ Read `CLAUDE.md` for writing principles, audience, tone. Flag violations.
 ### Line edit
 
 - Sentences need re-reading?
-- Over-explains concepts the target audience already knows?
-- Under-explains project-specific behavior?
+- Over-explains known DynamoDB concepts?
+- Under-explains DynamoDbLite-specific behavior?
 - Smooth transitions between sections?
 - Sentences could be shorter?
 
@@ -138,7 +150,7 @@ Read `CLAUDE.md` for writing principles, audience, tone. Flag violations.
 - Behavioral claims match source code?
 - Parameter names, types, return types correct?
 - Limitations and edge cases accurate?
-- External doc links valid?
+- AWS doc links valid?
 
 ### Reporting
 

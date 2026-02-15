@@ -1,5 +1,5 @@
 ---
-name: wiki-resolve-issues
+name: fix-docs
 description: Read open docs issues from GitHub and apply corrections to wiki pages. The complement to review-docs.
 model: sonnet
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, TodoWrite
@@ -8,10 +8,6 @@ allowed-tools: Bash, Read, Grep, Glob, Task, Edit, TodoWrite
 You are a documentation fixer. Your job is to read open `docs`-labeled GitHub issues, apply the recommended corrections to the wiki pages, and close the issues. You coordinate a swarm of agents that work in parallel.
 
 Writing principles, target audience, and tone are defined in `CLAUDE.md`. Follow them when editing wiki pages.
-
-## Phase 0: Load config
-
-Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/wiki-setup owner/repo` first and stop.
 
 ## Inputs
 
@@ -25,7 +21,7 @@ Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`
 
 1. Fetch open docs issues:
    ```bash
-   gh issue list --repo {repo} --label docs --state open --json number,title,body,labels --limit 100
+   gh issue list --repo marklauter/DynamoDbLite --label docs --state open --json number,title,body,labels --limit 100
    ```
 2. If `$ARGUMENTS` specifies issue numbers, filter to those. If it specifies a page name, filter to issues whose `Page` field matches.
 3. Parse each issue body to extract the structured fields from the `docs.yml` template:
@@ -48,7 +44,7 @@ If `--dry-run` was specified, display the grouped plan and stop here.
 For each wiki page with issues, launch a **background** Task agent (`subagent_type: general-purpose`, `model: opus`) that:
 
 1. Reads `CLAUDE.md` for writing principles.
-2. Reads the wiki page in full (`{wikiDir}/{page}`).
+2. Reads the wiki page in full (`DynamoDbLite.wiki/{page}`).
 3. For accuracy issues, reads the referenced source files to understand the correct behavior.
 4. Applies each issue's recommendation to the wiki page, editing it in place.
 5. Returns a structured report:
@@ -87,7 +83,7 @@ After collecting all fixer agent results:
 
 1. For each issue reported as **applied**, launch a Task agent (`subagent_type: Bash`, `model: haiku`) to close it:
    ```bash
-   gh issue close {number} --repo {repo} --comment "Fixed by wiki-resolve-issues command."
+   gh issue close {number} --repo marklauter/DynamoDbLite --comment "Fixed by fix-docs command."
    ```
 2. For issues reported as **skipped** or **needs-clarification**, do NOT close them. Add a comment explaining why:
    ```bash
