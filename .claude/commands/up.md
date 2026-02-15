@@ -1,6 +1,6 @@
 ---
 name: up
-description: Clone a GitHub repo and its wiki into the workspace. Sets up wiki-writer.config.json for all other commands.
+description: Clone a GitHub repo and its wiki into the workspace. Sets up workspace.config.yml for all other commands.
 allowed-tools: Bash, Read, Write, AskUserQuestion
 ---
 
@@ -10,7 +10,7 @@ Set up a project workspace for wiki editing.
 
 `$ARGUMENTS` is a GitHub repo slug in `owner/repo` format (e.g., `marklauter/DynamoDbLite`).
 
-If `$ARGUMENTS` is empty, read `wiki-writer.config.json` and confirm the current project. If the config file doesn't exist, ask the user for the repo slug.
+If `$ARGUMENTS` is empty, read `workspace.config.yml` and confirm the current project. If the config file doesn't exist, ask the user for the repo slug.
 
 ## Steps
 
@@ -40,25 +40,29 @@ If `$ARGUMENTS` is empty, read `wiki-writer.config.json` and confirm the current
 
 5. Check if `workspace/{repo}.wiki/_Sidebar.md` exists. If it does, read it to understand the existing wiki structure.
 
-6. Ask the user about audience and tone using AskUserQuestion:
+6. Prompt the user to confirm or customize **all** workspace config values using AskUserQuestion. Present sensible defaults based on the repo slug and any context gathered from CLAUDE.md/README. The user can accept defaults or override any value.
+
+   - **Repo slug**: Default `{owner}/{repo}`. Let the user confirm.
+   - **Source directory**: Default `workspace/{repo}`. Let the user override if they prefer a different path.
+   - **Wiki directory**: Default `workspace/{repo}.wiki`. Let the user override if they prefer a different path.
    - **Audience**: "Who is the target audience for this wiki?" Suggest a default based on what you learned from the project's CLAUDE.md and README, if available. Let the user confirm or override.
    - **Tone**: "What tone should the wiki use?" Offer options like "reference-style (assume domain familiarity)", "tutorial-style (step-by-step guidance)", or let the user describe their preference.
 
-7. Write `wiki-writer.config.json` at the project root:
-   ```json
-   {
-     "repo": "{owner}/{repo}",
-     "sourceDir": "workspace/{repo}",
-     "wikiDir": "workspace/{repo}.wiki",
-     "audience": "{user's answer}",
-     "tone": "{user's answer}"
-   }
+   You may batch these into one or two AskUserQuestion calls (up to 4 questions each) to keep the flow concise.
+
+7. Write `workspace.config.yml` at the project root using the user's confirmed values:
+   ```yaml
+   repo: "{confirmed repo slug}"
+   sourceDir: "{confirmed sourceDir}"
+   wikiDir: "{confirmed wikiDir}"
+   audience: "{confirmed audience}"
+   tone: "{confirmed tone}"
    ```
 
 8. Confirm the workspace is ready:
-   - Source repo: cloned/updated at `workspace/{repo}/`
-   - Wiki repo: cloned/updated at `workspace/{repo}.wiki/`
-   - Config written to `wiki-writer.config.json`
-   - Audience and tone configured
+   - Source repo: cloned/updated at `{sourceDir}/`
+   - Wiki repo: cloned/updated at `{wikiDir}/`
+   - Config written to `workspace.config.yml`
+   - All config values summarized
    - Summary of project context (from CLAUDE.md if available)
    - List of existing wiki pages (from _Sidebar.md if available)

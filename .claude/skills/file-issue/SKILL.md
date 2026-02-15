@@ -5,7 +5,7 @@ model: haiku
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
-Read `wiki-writer.config.json` to get `repo` and `sourceDir`.
+Read `workspace.config.yml` to get `repo` and `sourceDir`.
 
 Read the matching template for required fields and allowed values:
 

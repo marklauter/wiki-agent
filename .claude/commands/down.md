@@ -8,7 +8,7 @@ Tear down the current project workspace.
 
 ## Steps
 
-1. Read `wiki-writer.config.json` to get `sourceDir` and `wikiDir`. If the config file doesn't exist, tell the user there's nothing to tear down and stop.
+1. Read `workspace.config.yml` to get `sourceDir` and `wikiDir`. If the config file doesn't exist, tell the user there's nothing to tear down and stop.
 
 2. Check for uncommitted changes in the wiki repo:
    ```bash
@@ -29,7 +29,7 @@ Tear down the current project workspace.
 
 5. Remove the config file:
    ```bash
-   rm wiki-writer.config.json
+   rm workspace.config.yml
    ```
 
 6. Confirm teardown is complete. If the `workspace/` directory is now empty, remove it too.

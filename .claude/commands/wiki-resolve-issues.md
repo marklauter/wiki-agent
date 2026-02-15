@@ -11,7 +11,7 @@ Writing principles, target audience, and tone are defined in `CLAUDE.md`. Follow
 
 ## Phase 0: Load config
 
-Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/up owner/repo` first and stop.
+Read `workspace.config.yml` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/up owner/repo` first and stop.
 
 ## Inputs
 

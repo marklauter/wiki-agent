@@ -11,7 +11,7 @@ Audience, tone, writing principles: `CLAUDE.md`.
 
 ## Phase 0: Load config
 
-Read `wiki-writer.config.json` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/up owner/repo` first and stop.
+Read `workspace.config.yml` to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`. If the config file doesn't exist, tell the user to run `/up owner/repo` first and stop.
 
 ## Inputs
 
@@ -49,7 +49,7 @@ For each wiki page, launch a **background** Task agent (`subagent_type: Explore`
 ```
 # {wiki page name}
 
-## {finding slug}
+## {finding slug — short identifier, e.g. missing-prerequisites or stale-code-example}
 - **Finding:** {description}
 - **Quote:** {quoted text}
 - **Recommendation:** {fix}
@@ -57,44 +57,48 @@ For each wiki page, launch a **background** Task agent (`subagent_type: Explore`
 - **Severity:** [ must-fix | suggestion ]
 ```
 
-Example:
-```
-# Query-and-Scan.md
-
-## stale KeyConditionExpression example
-- **Finding:** code example shows `begins_with(SK, :prefix)` but parser expects no space after comma
-- **Quote:** `KeyConditionExpression = "PK = :pk AND begins_with(SK, :prefix)"`
-- **Recommendation:** remove space: `begins_with(SK,:prefix)`
-- **Pass:** accuracy
-- **Severity:** must-fix
-- **Source file:** src/DynamoDbLite/Expressions/KeyConditionParser.cs:38
-```
-
 Omit **Quote**, **Source file**, or **Recommendation** when not applicable.
 
 ### Agent prompt
 
-Include in each agent's prompt: full editorial standards section below, pass(es) to run, wiki page path, relevant source file paths, finding format and example above. Also include the `audience` and `tone` from the config so the agent can evaluate appropriateness.
+Include in each agent's prompt: full editorial standards section below, pass(es) to run, wiki page path, relevant source file paths, and finding format above. Also include the `audience` and `tone` from the config so the agent can evaluate appropriateness.
 
-Launch all agents in parallel (`run_in_background: true`), then collect results.
+Launch all agents in parallel (`run_in_background: true`). Collect results with `TaskOutput` (blocking). If an agent fails, retry once; if it fails again, skip the page and report it in Phase 5.
 
-## Phase 3: Issue filing
+## Phase 3: Deduplicate
+
+Before filing, filter out findings that already have open issues.
+
+1. Run: `gh issue list --repo {repo} --label documentation --state open --limit 200 --json number,title,body`
+2. Build a list of `(issue-number, title, body-snippet)` from the result.
+3. For each finding from Phase 2, check whether an existing open issue covers it:
+   - Title contains the same wiki page name **and** the finding slug or a close paraphrase.
+   - Or the issue body quotes the same text or describes the same problem.
+4. Mark matched findings as **skipped** (with the existing issue number). Remove them from the filing queue.
+
+Err on the side of filing — only skip when the match is clearly the same problem. A finding about a different section of the same page is not a duplicate.
+
+## Phase 4: Issue filing
 
 Follow `.claude/skills/file-issue/SKILL.md` with `docs.yml` template. Overrides:
 
 1. Group closely related findings sharing the same root cause into one issue.
 2. Launch Task agents (`subagent_type: general-purpose`, `model: haiku`) in parallel.
 3. Skip confirmation — user authorized filing by invoking the command.
-4. Title: `docs:` prefix, under 70 characters.
+4. Title: under 70 characters, no prefix (the `documentation` label provides categorization).
+5. Label: `documentation` (use `--label documentation` on `gh issue create`).
+6. Only file findings that survived Phase 3 deduplication.
 
-## Phase 4: Summary
+## Phase 5: Summary
 
 Output:
 
 1. **What's strong** — 1-2 sentences on what reviewed pages do well.
 2. **Issues filed** — table: Issue #, Page, Title, Severity, Pass.
-3. **Unverified items** — claims reviewers couldn't confirm against source (no issue filed).
-4. **Clean pages** — pages with no findings.
+3. **Skipped (duplicate)** — table: Existing Issue #, Page, Finding slug, reason matched.
+4. **Unverified items** — claims reviewers couldn't confirm against source (no issue filed).
+5. **Clean pages** — pages with no findings.
+6. **Failed reviews** — pages where the reviewer agent failed after retry, if any.
 
 ## Editorial standards
 
@@ -104,7 +108,7 @@ You are an editorial consultant reviewing technical documentation. Your job is t
 
 ### Style
 
-Read `CLAUDE.md` for writing principles, audience, tone. Flag violations.
+Read `.claude/guidance/editorial-guidance.md` for writing principles and `.claude/guidance/wiki-instructions.md` for wiki conventions. If `{sourceDir}/CLAUDE.md` exists, read it for project-specific style. Flag violations.
 
 ### Structural
 
