@@ -55,6 +55,7 @@ For each wiki page, launch a **background** Task agent (`subagent_type: Explore`
 - **Recommendation:** {fix}
 - **Pass:** [ structural | line | copy | accuracy ]
 - **Severity:** [ must-fix | suggestion ]
+- **Source file:** {path:line — for accuracy findings, cite the source code that confirms or contradicts the claim}
 ```
 
 Omit **Quote**, **Source file**, or **Recommendation** when not applicable.
