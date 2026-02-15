@@ -60,7 +60,7 @@ The file listing (excluding structural files) is the source of truth for availab
 
 Create the cache directory via Bash: `mkdir -p .proofread/{repo}`
 
-Launch three **background** Task agents (`subagent_type: Explore`, `model: opus`) in parallel, each exploring a different facet of the source code. All three should read `{sourceDir}/README.md` and `{sourceDir}/CLAUDE.md` (if it exists) as baseline, then focus on their assigned area:
+Launch three **background** Task agents (`subagent_type: wiki-explorer`, `model: opus`) in parallel, each exploring a different facet of the source code. All three should read `{sourceDir}/README.md` and `{sourceDir}/CLAUDE.md` (if it exists) as baseline, then focus on their assigned area:
 
 | Agent | Focus | Output file |
 |-------|-------|-------------|
@@ -74,7 +74,7 @@ Phase 4 agents read these files directly — the orchestrator passes only the fi
 
 ## Phase 4: Reviewer swarm
 
-For each wiki page, launch a **background** Task agent (`subagent_type: Explore`, `model: opus`) that:
+For each wiki page, launch a **background** Task agent (`subagent_type: wiki-reviewer`, `model: opus`) that:
 
 1. Reads the wiki page.
 2. Reads the project summary files from Phase 3 (`.proofread/{repo}/summary-api.md`, `.proofread/{repo}/summary-architecture.md`, `.proofread/{repo}/summary-config.md`).

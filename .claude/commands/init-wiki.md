@@ -42,7 +42,7 @@ Audience, tone, writing principles: `CLAUDE.md`.
 
 ## Phase 1: Explorer swarm (background agents)
 
-Launch 5 background Explore agents (`subagent_type: Explore`, `model: opus`, `run_in_background: true`) to examine distinct facets of the source code. Each agent receives the `sourceDir` path.
+Launch 5 background agents (`subagent_type: wiki-explorer`, `model: opus`, `run_in_background: true`) to examine distinct facets of the source code. Each agent receives the `sourceDir` path.
 
 ### Agent 1: Architecture
 
@@ -118,7 +118,7 @@ After the agent returns the proposed structure, present it to the user via `AskU
 
 ## Phase 3: Writer swarm (parallel agents)
 
-For each approved wiki page (except `_Sidebar.md`), launch a **background** Task agent (`subagent_type: general-purpose`, `model: opus`, `run_in_background: true`).
+For each approved wiki page (except `_Sidebar.md`), launch a **background** Task agent (`subagent_type: wiki-writer`, `model: opus`, `run_in_background: true`).
 
 ### What to tell each writer agent
 

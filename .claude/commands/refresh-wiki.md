@@ -40,7 +40,7 @@ If no tuples remain, report that the wiki appears up to date and stop.
 
 ## Phase 2: Explorer swarm (background agents)
 
-For each `(wiki-page, changed-source-files)` tuple, launch a **background** Task agent (`subagent_type: Explore`, `model: sonnet`) that:
+For each `(wiki-page, changed-source-files)` tuple, launch a **background** Task agent (`subagent_type: wiki-explorer`, `model: sonnet`) that:
 
 1. Reads the changed source files for that page's feature area.
 2. Reads the corresponding wiki page in `{wikiDir}/`.
@@ -93,7 +93,7 @@ Stop here. Do not proceed to Phase 3.
 
 ## Phase 3: Update swarm (parallel agents)
 
-For each page the explorers marked `STALE`, launch a Task agent (`subagent_type: general-purpose`, `model: opus`) to update that wiki page.
+For each page the explorers marked `STALE`, launch a Task agent (`subagent_type: wiki-writer`, `model: opus`) to update that wiki page.
 
 ### Agent prompt
 
