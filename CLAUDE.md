@@ -14,6 +14,8 @@ This repo is a reusable workspace. Target projects are cloned into `workspace/` 
 
 All commands read this config to resolve paths. If the config file doesn't exist, ask the user to run `/up owner/repo` first.
 
+The source repo is **READONLY**. Never stage, commit, or push changes to it. It is cloned only as reference for writing wiki content.
+
 ## Guidance
 
 - Read before editing or creating wiki pages: `.claude/guidance/editorial-guidance.md`
