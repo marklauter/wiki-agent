@@ -1,6 +1,6 @@
 ![wiki-writer](https://raw.githubusercontent.com/marklauter/wiki-agent/refs/heads/main/images/agent-logo.png)
 
-# wiki-writer
+# wiki-agent
 
 Claude Code toolset for GitHub wiki management. Works with any GitHub project.
 
