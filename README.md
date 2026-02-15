@@ -83,11 +83,11 @@ Tear down the current workspace. Before removing anything, it checks for:
 
 Then removes the cloned repos, config file, and (if empty) the `workspace/` directory.
 
-### `/wiki-sync`
+### `/refresh-wiki`
 
 Sync wiki pages with recent source code changes. Reads the last 50 commits from the source repo, identifies behavioral changes, maps them to wiki pages, and launches parallel agents to compare source against docs. Pages that are stale get updated automatically.
 
-### `/wiki-review`
+### `/proofread-wiki`
 
 Editorial review of wiki pages. Launches parallel reviewer agents that audit pages across four passes:
 
@@ -100,9 +100,9 @@ Editorial review of wiki pages. Launches parallel reviewer agents that audit pag
 
 Findings are filed as GitHub issues with the `docs` label. Run with specific pages or passes, or review everything at once.
 
-### `/wiki-resolve-issues`
+### `/resolve-issues`
 
-The complement to `/wiki-review`. Reads open `docs`-labeled GitHub issues, applies the recommended corrections to wiki pages, and closes the issues. Supports filtering by issue number or page name. Use `--dry-run` to preview changes without applying them.
+The complement to `/proofread-wiki`. Reads open `docs`-labeled GitHub issues, applies the recommended corrections to wiki pages, and closes the issues. Supports filtering by issue number or page name. Use `--dry-run` to preview changes without applying them.
 
 ## Switching projects
 

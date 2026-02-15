@@ -1,6 +1,6 @@
 ---
-name: wiki-resolve-issues
-description: Read open docs issues from GitHub and apply corrections to wiki pages. The complement to review-docs.
+name: resolve-issues
+description: Read open docs issues from GitHub and apply corrections to wiki pages. The complement to proofread-wiki.
 model: sonnet
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, TodoWrite
 ---
@@ -87,11 +87,11 @@ After collecting all fixer agent results:
 
 1. For each issue reported as **applied**, launch a Task agent (`subagent_type: Bash`, `model: haiku`) to close it:
    ```bash
-   gh issue close {number} --repo {repo} --comment "Fixed by wiki-resolve-issues command."
+   gh issue close {number} --repo {repo} --comment "Fixed by resolve-issues command."
    ```
 2. For issues reported as **skipped** or **needs-clarification**, do NOT close them. Add a comment explaining why:
    ```bash
-   gh issue comment {number} --repo {repo} --body "wiki-resolve-issues skipped this issue: {reason}"
+   gh issue comment {number} --repo {repo} --body "resolve-issues skipped this issue: {reason}"
    ```
 
 Launch all close/comment commands **in parallel**.

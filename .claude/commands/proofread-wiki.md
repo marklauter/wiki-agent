@@ -1,5 +1,5 @@
 ---
-name: wiki-review
+name: proofread-wiki
 description: Senior technical editor — reviews wiki pages for structure, clarity, accuracy, and style. Creates GitHub issues for each finding.
 model: sonnet
 allowed-tools: Bash, Read, Grep, Glob, Task, TodoWrite

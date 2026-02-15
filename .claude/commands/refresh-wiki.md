@@ -1,5 +1,5 @@
 ---
-name: wiki-sync
+name: refresh-wiki
 description: Sync wiki pages with source code changes. Uses parallel background agents to minimize main context usage.
 model: sonnet
 allowed-tools: Bash, Read, Grep, Glob, Task
