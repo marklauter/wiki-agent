@@ -82,7 +82,7 @@ What it does:
 
 - Verifies GitHub CLI authentication (`gh auth status`)
 - Asks for the source repo clone URL (full HTTPS or SSH URL from GitHub), target audience, and tone
-- If a workspace already exists for the same repo, asks to confirm overwrite
+- If a workspace already exists for the same repo, stops and tells you to run `/down` first
 - Clones the source repo and wiki repo into `workspace/{owner}/`
 - Writes `workspace/config/{owner}/{repo}/workspace.config.yml` with:
   - `repo` — GitHub `owner/repo` slug (parsed from the clone URL)
@@ -140,9 +140,9 @@ Launches parallel reviewer agents that audit pages across four passes:
 | Pass | Scope |
 |------|-------|
 | `structural` | Organization, flow, gaps, redundancies |
-| `line` | Sentence-level clarity and tightening |
+| `line` | Sentence-level clarity, tightening, transitions |
 | `copy` | Grammar, punctuation, formatting, terminology |
-| `accuracy` | Verify claims and examples against source code |
+| `accuracy` | Verify claims, examples, and behavior against source code |
 
 Files findings as GitHub issues with the `documentation` label. You can target specific pages or passes, or review everything at once.
 
