@@ -6,7 +6,7 @@ A project's empty wiki is populated with a complete, well-structured set of docu
 
 ## Context
 
-- **Bounded context:** Wiki Creation
+- **Bounded context:** [DC-01 Wiki Creation](domains/DC-01-wiki-creation.md)
 - **Primary actor:** User
 - **Supporting actors:** Orchestrator (`/init-wiki` command), Explorer agents (wiki-explorer), Planning agent (general-purpose), Writer agents (wiki-writer)
 - **Trigger:** The user has provisioned a workspace (UC-05) and wants to create wiki documentation for a project that does not yet have any.
@@ -107,7 +107,9 @@ One or more writer agents fail to write their assigned page. Successfully writte
 
 ## Domain events
 
-- **WikiPopulated** -- The wiki directory has been populated with a complete set of documentation pages from an approved plan. This is the foundational event in the Wiki Creation bounded context. After this event, the wiki is ready for review (UC-02) and publishing (`/save`). Carries: repo identity, list of sections with their pages (hierarchical structure matching _Sidebar.md), audience, tone, and wiki directory path.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions.
+
+- [DE-01 WikiPopulated](domains/DOMAIN-EVENTS.md#de-01----wikipopulated) -- Wiki population complete. Ready for review or publishing.
 
 ## Protocols
 

@@ -6,7 +6,7 @@ A project workspace ceases to exist. The system returns to the state it was in b
 
 ## Context
 
-- **Bounded context:** Workspace Lifecycle
+- **Bounded context:** [DC-05 Workspace Lifecycle](domains/DC-05-workspace-lifecycle.md)
 - **Primary actor:** User
 - **Supporting actors:** Git (working tree inspection)
 - **Trigger:** The user no longer needs the workspace for a given repository -- the wiki work is done, the project is archived, or the user wants to re-provision with different settings (audience, tone).
@@ -74,7 +74,9 @@ The wiki working tree has uncommitted changes, unpushed commits, or both. This i
 
 ## Domain events
 
-- **WorkspaceDecommissioned** -- The workspace config file, source clone, and wiki clone have been removed from disk. This is the inverse of WorkspaceProvisioned. After this event, the workspace selection procedure will no longer discover this workspace. Other bounded contexts do not need to react -- the workspace simply stops existing.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions.
+
+- [DE-07 WorkspaceDecommissioned](domains/DOMAIN-EVENTS.md#de-07----workspacedecommissioned) -- Workspace removed; no longer discoverable.
 
 ## Protocols
 

@@ -6,7 +6,7 @@ Every real problem in the wiki -- inaccuracies against source code, structural w
 
 ## Context
 
-- **Bounded context:** Editorial Review
+- **Bounded context:** [DC-02 Editorial Review](domains/DC-02-editorial-review.md)
 - **Primary actor:** User
 - **Supporting actors:** Orchestrator (`/proofread-wiki` command), Explorer agents (wiki-explorer), Reviewer agents (one per editorial lens), Deduplicator agent
 - **Trigger:** The user has a populated wiki (UC-01 or manually authored) and wants an independent editorial review.
@@ -136,13 +136,17 @@ The `file-issue.sh` script fails for a specific finding after its internal retry
 
 ## Domain events
 
-- **IssueIdentified** -- A reviewer agent has found a documentation problem. Internal event within Editorial Review. Carries: page, editorial lens, severity, finding text, recommendation, source file citation (accuracy lens only). Materialized as a finding file in the proofread cache. Consumed by the deduplicator.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions of published events.
 
-- **IssueToBeFiled** -- (Milestone, not a domain event.) The deduplicator has confirmed that a finding is new -- no matching open issue exists. Carries the same payload as IssueIdentified. Materialized as a deduplicated finding in the cache. Consumed by the orchestrator for issue filing within this same use case.
+### Published events
 
-- **FindingFiled** -- A GitHub issue has been created for a documentation problem. Published event that crosses the boundary into Issue Resolution (UC-03). Carries: issue number, page, editorial lens, severity, finding text, recommendation. Materialized as a GitHub issue with the `documentation` label. GitHub is a sub-system of this system -- the issue is the durable fact.
+- [DE-02 FindingFiled](domains/DOMAIN-EVENTS.md#de-02----findingfiled) -- GitHub issue created for a documentation problem. Published to [DC-03 Issue Resolution](domains/DC-03-issue-resolution.md).
+- [DE-03 WikiReviewed](domains/DOMAIN-EVENTS.md#de-03----wikireviewed) -- Review process completed.
 
-- **WikiReviewed** -- The review process has completed. Carries: pages reviewed, issues identified count, issues filed count, clean pages, failed reviews, failed filings. Success is defined as: every finding that survived deduplication was successfully filed as a GitHub issue (issues identified after dedup == issues filed).
+### Internal events
+
+- **IssueIdentified** -- A reviewer has found a documentation problem. Materialized as a finding in the proofread cache. Consumed by the deduplicator.
+- **IssueToBeFiled** -- (Milestone.) Deduplicator confirmed a finding is new. Consumed by the orchestrator for issue filing.
 
 ## Protocols
 

@@ -6,7 +6,7 @@ Every factual claim in the wiki accurately reflects the current state of its sou
 
 ## Context
 
-- **Bounded context:** Drift Detection
+- **Bounded context:** [DC-04 Drift Detection](domains/DC-04-drift-detection.md)
 - **Primary actor:** User
 - **Supporting actors:** Orchestrator (`/refresh-wiki` command), Fact-checker agents, Writer agents (wiki-writer, shared with UC-03)
 - **Trigger:** The user suspects the wiki has drifted from the source code -- source code has been updated, time has passed since the last sync, or the user wants to increase confidence in the wiki's accuracy.
@@ -113,13 +113,17 @@ The writer reads the cited source file and finds that the wiki is actually corre
 
 ## Domain events
 
-- **DriftDetected** -- A fact-checker has found that a wiki claim does not match its source of truth. Internal to Drift Detection. Carries: page, the inaccurate claim (quoted text), the correct fact, the source reference (file path and line, URL, or other identifier). Structurally compatible with UC-03's writer input: both provide a page, a finding (what's wrong), a recommendation (what it should say), and a source reference. This compatibility enables writer agent reuse.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions of published events.
 
-- **DriftSkipped** -- A fact-checker could not verify a claim because its source of truth was unreachable. Internal to Drift Detection. Carries: page, the unverifiable claim (quoted text), the unreachable source (URL, API endpoint, etc.). Surfaces in the report's errata section.
+### Published events
 
-- **DriftCorrected** -- A writer has applied a correction to a wiki page. The fix is on disk. Internal to Drift Detection. Carries: page, the original claim (quoted text), the corrected text, the source reference. Materializes in the sync report.
+- [DE-05 WikiSynced](domains/DOMAIN-EVENTS.md#de-05----wikisynced) -- Sync operation completed.
 
-- **WikiSynced** -- The sync operation has completed. The completion event for Drift Detection, analogous to WikiReviewed (UC-02) and WikiRemediated (UC-03). Carries: pages checked count, corrections applied count, claims skipped (unverifiable) count, pages up-to-date count, pages unchecked (fact-checker failure) count. Materialized as the sync report on disk.
+### Internal events
+
+- **DriftDetected** -- A fact-checker found a wiki claim that does not match its source of truth. Structurally compatible with [DC-03](domains/DC-03-issue-resolution.md)'s correction assignment, enabling writer agent reuse.
+- **DriftSkipped** -- A fact-checker could not verify a claim (source unreachable). Surfaces in the report's errata section.
+- **DriftCorrected** -- A writer applied a correction. Materializes in the sync report.
 
 ## Protocols
 

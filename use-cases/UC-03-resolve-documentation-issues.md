@@ -6,7 +6,7 @@ Every actionable documentation problem tracked in GitHub Issues has its recommen
 
 ## Context
 
-- **Bounded context:** Issue Resolution
+- **Bounded context:** [DC-03 Issue Resolution](domains/DC-03-issue-resolution.md)
 - **Primary actor:** User
 - **Supporting actors:** Orchestrator (`/resolve-issues` command), Fixer agents (one per wiki page with issues)
 - **Trigger:** The user has open documentation issues (typically produced by UC-02) and wants the recommended corrections applied to the wiki.
@@ -126,13 +126,17 @@ The fix was applied to the wiki file on disk, but the GitHub API call to close o
 
 ## Domain events
 
-- **IssueCorrected** -- A fixer agent has applied a recommendation to a wiki page. The fix is on disk. Carries: issue number, page, editorial lens, description of the change. Internal to Issue Resolution. Consumed by the orchestrator to close the corresponding GitHub issue.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions of published events.
 
-- **IssueSkipped** -- A fixer agent has examined an issue and determined it cannot be remediated. Carries: issue number, page, reason (quoted text no longer present, recommendation is ambiguous, recommendation contradicts source code). Internal to Issue Resolution. Consumed by the orchestrator to comment on the GitHub issue.
+### Published events
 
-- **IssueCloseDeferred** -- The orchestrator applied a fix to the wiki but could not close or comment on the GitHub issue (API failure). The fix is on disk; the issue remains open. Carries: issue number, page, error detail. Surfaced in the summary so the user can close the issue manually.
+- [DE-04 WikiRemediated](domains/DOMAIN-EVENTS.md#de-04----wikiremediated) -- Remediation run completed.
 
-- **WikiRemediated** -- The remediation run has completed. Carries: issues corrected count, issues skipped count, issues close-deferred count, remaining open count. This is the completion event for Issue Resolution, analogous to UC-02's WikiReviewed.
+### Internal events
+
+- **IssueCorrected** -- A fixer has applied a recommendation. Consumed by the orchestrator to close the GitHub issue.
+- **IssueSkipped** -- A fixer could not remediate an issue. Consumed by the orchestrator to comment on the GitHub issue.
+- **IssueCloseDeferred** -- Fix applied but GitHub issue could not be closed (API failure). Surfaced in summary.
 
 ## Protocols
 

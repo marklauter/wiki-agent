@@ -6,7 +6,7 @@ A new project workspace exists and is ready for wiki operations. The user can im
 
 ## Context
 
-- **Bounded context:** Workspace Lifecycle
+- **Bounded context:** [DC-05 Workspace Lifecycle](domains/DC-05-workspace-lifecycle.md)
 - **Primary actor:** User
 - **Supporting actors:** GitHub (remote repository host), Git (cloning tool)
 - **Trigger:** The user wants to manage wiki documentation for a GitHub project that does not yet have a workspace in this system.
@@ -88,7 +88,9 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 ## Domain events
 
-- **WorkspaceProvisioned** -- A new workspace configuration file has been written to disk. This is the durable fact that all other bounded contexts discover at workspace selection time by scanning for config files matching `workspace/config/*/*/workspace.config.yml`. Carries: repo slug, source dir path, wiki dir path, audience, and tone.
+See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions.
+
+- [DE-06 WorkspaceProvisioned](domains/DOMAIN-EVENTS.md#de-06----workspaceprovisioned) -- Workspace config written; discoverable by all operational contexts.
 
 ## Protocols
 
