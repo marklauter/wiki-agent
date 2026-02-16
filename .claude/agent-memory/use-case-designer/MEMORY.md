@@ -3,6 +3,7 @@
 ## Domain terminology
 
 - **WorkspaceProvisioned** -- domain event from UC-05. Materialized as the config file on disk, not a message.
+- **WorkspaceDecommissioned** -- domain event from UC-06. Inverse of WorkspaceProvisioned. The workspace stops existing.
 - **Workspace identity** -- defined by the existence of `workspace/config/{owner}/{repo}/workspace.config.yml`. No config = no workspace.
 - **Drift Detection** -- bounded context for UC-04. Separate from exploration and correction.
 
@@ -18,11 +19,17 @@
 - "Getting latest" (git pull) is a shared invariant, not a use case. Each use case enforces freshness in its own way.
 - Context absorption (reading target CLAUDE.md, _Sidebar.md) happens in `/up` as UX convenience AND independently in each downstream command. It is not part of the provisioning contract.
 - Audience and tone are immutable after provisioning. No edit path exists; user must `/down` then `/up`.
+- **Wiki repo must exist before provisioning.** User must create Home page via GitHub UI first. No CLI/API can create a wiki. Updated in UC-05 as invariant.
+- **Commands do not chain.** Each command is a self-contained interaction. User cancels, uses other tools, comes back.
+- **UC-07 (Publish Wiki Changes) is OUT OF SCOPE.** Users commit and push using their own git tools. The system does not own the publish workflow. Design decisions recorded before scoping out: semantic commit messages (diff-based), no confirmation gate, pull --rebase before push.
+- **No CLI-style flags on agent commands.** No `--force`, no `--all`. These are agent interactions, not C programs. Confirmation is done through typed repo name, not flags.
+- **Type-to-confirm pattern.** When destructive action threatens unpublished work, user types the repo name (e.g., `acme/WidgetLib`) to confirm. Established in UC-06.
 
 ## Implementation gaps found
 
 - `/up` command file writes config BEFORE cloning; clone script clones first THEN writes config. Script ordering is safer.
 - Command file and clone script are dual implementations of the same logic -- command does not call the script.
+- `/down` command file supports `--force`, `--all`, inlines git commands. Needs update: single workspace, always check safety, type-to-confirm, delegate to scripts.
 
 ## Use case map
 

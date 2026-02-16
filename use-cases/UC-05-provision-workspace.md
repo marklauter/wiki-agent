@@ -17,16 +17,15 @@ No agents are involved. The User drives the interaction directly through the `/u
 
 ## Invariants
 
-- **One workspace per repository.** A workspace for a given `owner/repo` either exists or it does not. If the config file exists, provisioning refuses. There is no partial update, no overwrite, no merge.
+See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invariants (GitHub CLI, source readonly, config as identity, scripts own deterministic behavior, etc.)
+
 - **Provisioning never tears down.** `/up` will not remove, modify, or overwrite an existing workspace. Teardown is exclusively the concern of UC-06 (Decommission Workspace).
-- **Source repo is readonly.** The source clone is created during provisioning and must never be staged, committed, or pushed to by any use case in the system. It exists solely as reference material.
-- **Config is the source of truth for workspace identity.** The existence of `workspace/config/{owner}/{repo}/workspace.config.yml` defines whether a workspace exists. Directories without a config file are not workspaces.
-- **GitHub CLI is installed.** (Cross-cutting -- applies to all use cases.) The `gh` CLI must be available on the system. If it is not installed, the user is notified. Authentication is the concern of `gh` itself, not this system.
+- **Both repos must pre-exist on GitHub.** The source repository and its wiki repository must both exist on GitHub before provisioning can complete. The wiki must have its Home page created via the GitHub UI -- no CLI or API endpoint exists to create a wiki programmatically.
 
 ## Success outcome
 
 - Source repository is cloned into `workspace/{owner}/{repo}/` as a readonly reference.
-- Wiki repository is cloned into `workspace/{owner}/{repo}.wiki/` if the wiki exists on GitHub.
+- Wiki repository is cloned into `workspace/{owner}/{repo}.wiki/`.
 - `workspace/config/{owner}/{repo}/workspace.config.yml` is written with repo identity, paths, audience, and tone.
 - The user sees a summary of what was provisioned: repo identity, paths, and config values.
 
@@ -42,11 +41,13 @@ No agents are involved. The User drives the interaction directly through the `/u
 2. **User** -- Provides the source repository clone URL, target audience, and writing tone in response to the interview prompts.
 3. **System** -- Extracts repository identity (owner and repo name) from the clone URL.
 4. **System** -- Confirms no workspace exists for this repository.
-5. **System** -- Clones the source repository into the workspace.
-6. **System** -- Attempts to clone the wiki repository (non-fatal if the wiki does not exist yet).
-7. **System** -- Writes the workspace configuration file.
+5. **System** -- Validates that the source repository exists on GitHub.
+6. **System** -- Validates that the wiki repository exists on GitHub.
+7. **System** -- Clones the source repository into the workspace.
+8. **System** -- Clones the wiki repository into the workspace.
+9. **System** -- Writes the workspace configuration file.
    --> WorkspaceProvisioned
-8. **User** -- Sees a summary of the provisioned workspace: repo identity, paths, and config values.
+10. **User** -- Sees a summary of the provisioned workspace: repo identity, paths, and config values.
 
 ## Goal obstacles
 
@@ -60,31 +61,44 @@ No agents are involved. The User drives the interaction directly through the `/u
 1. **System** -- Reports that a workspace for this repository already exists and directs the user to run `/down` first if they want to start fresh.
 2. **System** -- Stops. No state is modified.
 
-### Step 5a -- Source clone fails
+### Step 5a -- Source repository does not exist on GitHub
 
-1. **System** -- Reports the clone failure (network error, repository not found, permission denied, authentication failure).
+1. **System** -- Reports that the repository could not be found on GitHub (not found, or permission denied).
+2. **System** -- Stops. The user verifies the URL and their access, then retries `/up`.
+
+### Step 6a -- Wiki does not exist on GitHub
+
+1. **System** -- Reports that the wiki repository does not exist. The most likely cause is that the wiki has not been initialized.
+2. **System** -- Provides instructions: navigate to the repository on GitHub, go to the Wiki tab, and create the Home page. GitHub wikis can only be initialized through the web UI -- no CLI or API endpoint exists.
+3. **System** -- Waits for the user to confirm they have created the wiki.
+4. **User** -- Creates the Home page on GitHub and confirms.
+5. **System** -- Re-validates that the wiki now exists. If it does, the scenario resumes at step 7 (clone source). If it still does not exist, the system reports the issue and waits again.
+
+### Step 7a -- Source clone fails
+
+1. **System** -- Reports the clone failure (network error, permission denied, authentication failure).
 2. **System** -- Cleans up any partial directory state. No config file is written.
-3. **System** -- Stops. The user resolves the underlying issue (network, permissions, URL correctness) and retries `/up`.
+3. **System** -- Stops. The user resolves the underlying issue and retries `/up`.
 
-### Step 6a -- Wiki clone fails
+### Step 8a -- Wiki clone fails
 
-1. **System** -- Warns that the wiki repository could not be cloned. The project may not have its wiki initialized on GitHub yet.
-2. **System** -- Continues with provisioning. The workspace is created without a wiki directory. The user can initialize the wiki later with `/init-wiki` or create the first page on GitHub to enable cloning.
+1. **System** -- Reports the wiki clone failure. The wiki was validated as existing in step 6, so this is likely a network or authentication issue.
+2. **System** -- Cleans up any partial directory state (source clone already created in step 7). No config file is written.
+3. **System** -- Stops. The user resolves the underlying issue and retries `/up`.
 
 ## Domain events
 
-- **WorkspaceProvisioned** -- A new workspace configuration file has been written to disk. This is the durable fact that all other bounded contexts discover at workspace selection time by scanning for config files matching `workspace/config/*/*/workspace.config.yml`. Carries: repo slug, source dir path, wiki dir path, audience, tone, and whether the wiki was successfully cloned.
+- **WorkspaceProvisioned** -- A new workspace configuration file has been written to disk. This is the durable fact that all other bounded contexts discover at workspace selection time by scanning for config files matching `workspace/config/*/*/workspace.config.yml`. Carries: repo slug, source dir path, wiki dir path, audience, and tone.
 
 ## Protocols
 
-- **workspace.config.yml** -- step 7, the output artifact of provisioning. This file is the contract between Workspace Lifecycle and all other bounded contexts. Its schema (repo, sourceDir, wikiDir, audience, tone) is consumed by the workspace selection procedure that every downstream command executes before operating.
+- **workspace.config.yml** -- step 9, the output artifact of provisioning. This file is the contract between Workspace Lifecycle and all other bounded contexts. Its schema (repo, sourceDir, wikiDir, audience, tone) is consumed by the workspace selection procedure that every downstream command executes before operating.
 
 ## Notes
 
-- **No repo validation before cloning.** The system does not pre-verify that the repository exists on GitHub. It attempts the clone and reports failure if it does not succeed. This is intentional -- `git clone` provides the most accurate error information.
+- **Validate before cloning.** The system verifies both the source repo and wiki repo exist on GitHub before attempting any clones. This provides clear, actionable error messages and enables the wait-and-retry flow for wiki creation.
 - **Context absorption belongs to the editorial domain.** Reading the target project's CLAUDE.md and the wiki's `_Sidebar.md` is an editorial concern (UC-01, UC-02, UC-04), not a workspace lifecycle concern. Provisioning does not read or present project content.
-- **Scripts own deterministic behavior.** All deterministic operations (git clone, gh API calls, config I/O, filesystem manipulation) belong in `.scripts/`, not inlined in command prompts. Scripts are testable, predictable, and immune to prompt drift. The LLM's role is judgment: interviews, analysis, content authoring. The clone script (`clone-workspace.sh`) is the single source of truth for provisioning mechanics. The `/up` command should delegate to it after collecting user inputs.
+- **Scripts own deterministic behavior.** (See [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md).) The clone script (`clone-workspace.sh`) is the single source of truth for provisioning mechanics. The `/up` command should delegate to it after collecting user inputs.
 - **Implementation gap: command vs. script reconciliation.** The `/up` command file and `clone-workspace.sh` currently implement the same logic independently. The command file writes config before cloning; the script clones first then writes config. The script's ordering is safer (no orphaned config on clone failure). This use case follows the script's ordering and the command should be updated to delegate to the script.
-- **Wiki directory absence.** Downstream commands that operate on the wiki directory must handle its absence gracefully when the wiki was not cloned during provisioning (obstacle 6a).
 - **Audience and tone are immutable.** There is currently no edit path for these values. Changing them requires `/down` then `/up`.
-- **Relationship to other use cases:** UC-05 is a prerequisite for UC-01 (Populate New Wiki), UC-02 (Review Wiki Quality), UC-03 (Resolve Documentation Issues), UC-04 (Sync Wiki with Source Changes), and UC-07 (Publish Wiki Changes). UC-06 (Decommission Workspace) is its inverse.
+- **Relationship to other use cases:** UC-05 is a prerequisite for UC-01 (Populate New Wiki), UC-02 (Review Wiki Quality), UC-03 (Resolve Documentation Issues), and UC-04 (Sync Wiki with Source Changes). UC-06 (Decommission Workspace) is its inverse. UC-07 (Publish Wiki Changes) is out of scope -- users commit and push using their own git tools.
