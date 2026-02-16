@@ -37,7 +37,7 @@ Follow the **Workspace selection** procedure in `CLAUDE.md`:
 2. If `$ARGUMENTS` specifies issue numbers, filter to those. If it specifies a page name, filter to issues whose `Page` field matches.
 3. Parse each issue body to extract the structured fields from the `docs.yml` template:
    - **Page** — wiki page filename
-   - **Pass** — structural, line edit, copy edit, or accuracy
+   - **Editorial lens** — structure, line, copy, or accuracy
    - **Severity** — must-fix or suggestion
    - **Finding** — what's wrong, including quoted text
    - **Recommendation** — what to do about it
@@ -74,7 +74,7 @@ For each wiki page with issues, launch a **background** Task agent (`subagent_ty
 Pass to each agent:
 
 - The wiki page path to edit
-- The full list of parsed issues for that page (number, title, finding, recommendation, pass, severity, source file, notes)
+- The full list of parsed issues for that page (number, title, finding, recommendation, editorial lens, severity, source file, notes)
 - The source file paths to read for accuracy issues
 - Instruction to read `CLAUDE.md` for writing principles before editing
 - Instruction to read the wiki page before editing — use the Edit tool, not Write, to make targeted changes

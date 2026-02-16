@@ -20,23 +20,6 @@ Follow the **Workspace selection** procedure in `CLAUDE.md`:
 5. If no workspaces exist, tell the user to run `/up` first and stop.
 6. Read the selected config file to get `repo`, `sourceDir`, `wikiDir`, `audience`, and `tone`.
 
-## Inputs
-
-- `$ARGUMENTS`: wiki page paths (relative to `{wikiDir}/`) and optional `--pass` flag.
-- No files specified → review all pages discovered in Phase 1.
-- No `--pass` flag → run all passes.
-- Only one `--pass` value may be specified per invocation. If an unrecognized value is given, list the four valid pass names and stop.
-
-### Passes
-
-| Flag | Scope |
-|------|-------|
-| `--pass structural` | Organization, flow, gaps, redundancies |
-| `--pass line` | Sentence-level clarity, tightening, transitions |
-| `--pass copy` | Grammar, punctuation, formatting, terminology |
-| `--pass accuracy` | Verify claims, examples, behavior against source |
-| (no flag) | All four in order |
-
 ## Phase 1: Validate wiki structure
 
 Structural files are wiki-internal and excluded from orphan detection and editorial review: `_Sidebar.md`, `_Footer.md`, `_Header.md`, and any other `_`-prefixed `.md` files.
@@ -81,7 +64,7 @@ For each wiki page, launch a **background** Task agent (`subagent_type: wiki-rev
 3. Identifies relevant source files: extract identifiers from fenced code blocks and inline code (class names, method names, file paths, namespaces), grep `{sourceDir}/` for matches, and use the top results for verification.
 4. Reads those source files to verify accuracy.
 5. Reads `{wikiDir}/_Sidebar.md` to check cross-reference links.
-6. Applies requested pass(es) using editorial standards below.
+6. Applies all four editorial lenses using editorial standards below.
 7. Writes findings to `.proofread/{repo}/findings-{page-filename}` via Bash using the format below, then returns a brief confirmation.
 ```
 # {wiki page name}
@@ -89,7 +72,7 @@ For each wiki page, launch a **background** Task agent (`subagent_type: wiki-rev
 ## {finding slug — short identifier, e.g. missing-prerequisites or stale-code-example}
 - **Finding:** {description. Quote the problematic text inline.}
 - **Recommendation:** {fix. Include corrected text for line/copy edits.}
-- **Pass:** {exact dropdown value from template, e.g. "Structural — organization, flow, gaps, redundancies"}
+- **Editorial lens:** {exact dropdown value from template, e.g. "Structure — organization, flow, gaps, redundancies"}
 - **Severity:** {exact dropdown value: "must-fix — readers will be confused or misled" or "suggestion — works but could be better"}
 - **Source file:** {path:line — for accuracy findings only}
 ```
@@ -98,7 +81,7 @@ Omit **Source file** or **Recommendation** when not applicable.
 
 ### Agent prompt
 
-Include in each agent's prompt: the summary file paths from Phase 3, full editorial standards section below, pass(es) to run, wiki page path, `{sourceDir}/` path for source file discovery, the output file path (`.proofread/{repo}/findings-{page-filename}`), finding format above, and the exact dropdown values from `.github/ISSUE_TEMPLATE/wiki-docs.yml` for **Pass** and **Severity** fields. Also include the `audience` and `tone` from the config so the agent can evaluate appropriateness.
+Include in each agent's prompt: the summary file paths from Phase 3, full editorial standards section below, wiki page path, `{sourceDir}/` path for source file discovery, the output file path (`.proofread/{repo}/findings-{page-filename}`), finding format above, and the exact dropdown values from `.github/ISSUE_TEMPLATE/wiki-docs.yml` for **Editorial lens** and **Severity** fields. Also include the `audience` and `tone` from the config so the agent can evaluate appropriateness.
 
 Launch all agents in parallel (`run_in_background: true`). Collect results with `TaskOutput` (blocking).
 
@@ -130,7 +113,7 @@ Read `.github/ISSUE_TEMPLATE/wiki-docs.yml` for body field definitions. Build th
 
 Map agent findings to issue body fields:
 - `### Page` ← wiki page filename
-- `### Pass` ← finding's **Pass** value (must match a template dropdown option exactly)
+- `### Editorial lens` ← finding's **Editorial lens** value (must match a template dropdown option exactly)
 - `### Severity` ← finding's **Severity** value (must match a template dropdown option exactly)
 - `### Finding` ← finding's **Finding** value (includes quoted text inline)
 - `### Recommendation` ← finding's **Recommendation** value, or `_No response_` if omitted
@@ -146,8 +129,8 @@ bash .scripts/file-issue.sh "TITLE" <<'EOF'
 ### Page
 Query-and-Scan.md
 
-### Pass
-Structural — organization, flow, gaps, redundancies
+### Editorial lens
+Structure — organization, flow, gaps, redundancies
 
 ### Severity
 must-fix — readers will be confused or misled
@@ -172,7 +155,7 @@ EOF
 ---
 title: "{issue title}"
 page: "{wiki page filename}"
-pass: "{pass value}"
+editorial-lens: "{editorial lens value}"
 severity: "{severity value}"
 ---
 
@@ -193,7 +176,7 @@ Log the failure and continue with remaining issues.
 Output:
 
 1. **What's strong** — 1-2 sentences on what reviewed pages do well.
-2. **Issues filed** — table: Issue #, Page, Title, Severity, Pass.
+2. **Issues filed** — table: Issue #, Page, Title, Severity, Editorial lens.
 3. **Unverified items** — claims reviewers couldn't confirm against source (no issue filed).
 4. **Clean pages** — pages with no findings.
 5. **Failed reviews** — pages where the reviewer agent failed after retry, if any.
@@ -202,7 +185,7 @@ Output:
 
 ## Editorial standards
 
-Pass this entire section to each explorer agent. It frames their role and provides the checklists they apply.
+Include this entire section in each reviewer agent's prompt. It frames their role and provides the checklists they apply.
 
 You are an editorial consultant reviewing technical documentation. Your job is to find real problems — not to rewrite, not to nitpick, but to identify issues that would confuse or mislead a reader.
 
