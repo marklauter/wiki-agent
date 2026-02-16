@@ -2,9 +2,33 @@
 
 Guiding principles for writing use cases in this project. Every use case must reflect these ideas.
 
+## Actors have drives
+
+An actor is an entity with a goal and a *drive* — the thing it naturally optimizes for. Classical actors have drives rooted in human motivation: self-interest, professional duty, economic pressure. AI agents have drives rooted in behavioral tendency: what they optimize for given their role and prompt.
+
+Consider an elevator system. The rider's drive is self-interest — arrive at another floor safely. The building owner's drive is economic — minimize maintenance cost. The government inspector's drive is institutional — protect public safety. Now consider this system. A wiki-writer agent's drive is production — fill pages with content. A wiki-reviewer agent's drive is critique — find what's wrong.
+
+Drives are what make actors predictable in a modeling sense. You know what an actor will optimize for, and therefore where it will fall short. An actor is not a tool. A tool has no drive — `grep` does exactly what you tell it. An actor makes decisions shaped by what it cares about.
+
+## Drives explain separation
+
+When a single drive cannot protect all the concerns at play, you need separate actors. The building owner's cost-minimization drive is insufficient to protect public safety — so the inspector exists. The wiki-writer's production drive is insufficient to guarantee accuracy — so the reviewer exists.
+
+This is not about malice. The owner isn't trying to hurt riders. The writer isn't trying to produce inaccurate content. But a single drive cannot serve competing concerns. Separation of actors is the structural answer to conflicts of interest between drives.
+
+Ask "whose drive is insufficient here, and what complementary drive is needed?"
+
+## Goal conflicts spawn actors
+
+Actors do not emerge from job descriptions. They emerge from goal conflicts. The inspector exists because the owner's incentives alone won't protect the rider. The reviewer exists because the writer's tendencies alone won't protect accuracy.
+
+If there is no conflict of interest — no tension between what one drive optimizes for and what the overall goal requires — there is no reason for a separate actor.
+
 ## Goals over tasks
 
 Use cases describe what an actor wants to achieve, not what steps they perform. Goals are stable — they survive model upgrades, tool changes, and prompt rewrites. Tasks are transient means to an end.
+
+A goal includes its constraints. "Get to floor 12" is a task. "Arrive at another floor safely" is a goal. Safety is not a precondition bolted on afterward — it is part of the desired end state. If the elevator rips the rider's arm off on the way to floor 12, the goal was not satisfied.
 
 Ask "what state of the world does the actor want?" not "what commands does the actor run?"
 
@@ -41,5 +65,7 @@ Respect boundaries. Define protocols at every crossing point.
 ## Single responsibility for agents
 
 Writers write. Explorers explore. Reviewers review. Orchestrators coordinate. An agent that both decides what to write and evaluates whether it wrote well has two jobs and will do both poorly.
+
+This is a corollary of drive separation. Each agent has one drive. A writer's drive is production. A reviewer's drive is critique. An agent with both drives will compromise between them — producing content that is "good enough" rather than content that is excellent and then separately verified. Two agents with opposing drives produce better outcomes than one agent trying to balance competing concerns.
 
 Separate judgment from execution. Separate analysis from mutation.
