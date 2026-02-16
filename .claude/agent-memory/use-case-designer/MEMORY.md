@@ -20,6 +20,12 @@
 - **IssueCloseDeferred** -- domain event from UC-03. Fix applied on disk but GitHub issue could not be closed. Carries: issue number, page, error detail.
 - **WikiRemediated** -- domain event from UC-03. Remediation run complete. Carries: corrected count, skipped count, close-deferred count, remaining open count.
 - **Remediation drive** -- fixer agent drive in UC-03. Applying known fixes to known problems. Not discovery (UC-02) and not production (UC-01).
+- **DriftDetected** -- domain event from UC-04. Fact-checker finds wiki claim doesn't match source of truth. Internal to Drift Detection. Carries: page, inaccurate claim, correct fact, source reference. Structurally compatible with UC-03 writer input.
+- **DriftSkipped** -- domain event from UC-04. Fact-checker cannot verify a claim (source unreachable). Internal to Drift Detection. Carries: page, unverifiable claim, unreachable source.
+- **DriftCorrected** -- domain event from UC-04. Writer applied a correction. Internal to Drift Detection. Carries: page, original claim, corrected text, source reference.
+- **WikiSynced** -- domain event from UC-04. Sync complete. Carries: pages checked, corrections applied, claims skipped, pages up-to-date, pages unchecked.
+- **Verification drive** -- fact-checker agent drive in UC-04. Determining what is true. Not correction (writer) and not critique (UC-02 reviewer).
+- **Correction drive** -- writer agent drive in UC-04 (shared with UC-03's fixer). Applying known corrections. Reusable because both consume: page, finding, recommendation, source reference.
 
 ## Cross-cutting invariants
 
@@ -53,6 +59,13 @@
 - **No scope selection for /resolve-issues.** No `-plan` flag, no issue number filters, no page name filters. Remediates all open actionable issues. Scope narrowing, if needed, through conversation.
 - **Unstructured issues are invisible.** Issues not following wiki-docs.yml template are skipped silently. System only processes what it can parse.
 - **`needs-clarification` label.** When fixer skips due to ambiguity, orchestrator adds `needs-clarification` label to GitHub issue. Makes ambiguous issues filterable.
+- **UC-04 does not touch GitHub Issues.** No reading, filing, closing, or commenting. Purely: read wiki, verify against sources, update wiki, report. Stale UC-02 issues are an accepted gap.
+- **`-plan` flag removed from UC-04.** Same as UC-02/UC-03. Every run produces different results; dry runs waste tokens. User reviews via git diff after.
+- **External references are sources of truth.** UC-04 verifies wiki against ALL sources: source code AND external URLs/linked resources. UC-02's accuracy lens is strictly source-code-grounded (noted as gap to address later).
+- **Git is the approval gate for UC-04.** No plan approval, no confirmation step. User reviews changes post-hoc via git diff/revert. Appropriate because corrections are targeted and reversible.
+- **Recent changes are context, not scope.** Fact-checkers check all claims on every page. Recent source changes tell them where to look harder, not which pages to skip.
+- **Writer agent reuse between UC-03 and UC-04.** Both consume structurally compatible input: page, finding, recommendation, source reference. Correction assignment protocol designed for compatibility.
+- **Sync reports accumulate.** Time-stamped, durable, stored at `workspace/reports/{owner}/{repo}/{date-time}/sync-report.md`. User tracks accuracy trends over time.
 
 ## Implementation gaps found
 
@@ -68,6 +81,10 @@
 - `/resolve-issues` command file uses "Pass" in parsed fields. Use case uses "Editorial lens." Command needs terminology update.
 - `/resolve-issues` command file description says "docs-labeled." Actual label is `documentation`. Terminology mismatch.
 - `close-issue.sh` does not support adding labels. UC-03 requires adding `needs-clarification` label. Script needs `--label` option or separate `gh issue edit --add-label` call.
+- `/refresh-wiki` command file scope is too narrow -- only checks pages mapped to recently changed source files. UC-04 checks all content pages against all sources of truth.
+- `/refresh-wiki` command file supports `-plan` flag. UC-04 removes it.
+- `/refresh-wiki` command file uses "last 50 commits" heuristic. UC-04 says "recent changes" without prescribing commit count.
+- `/refresh-wiki` command file produces console summary only. UC-04 requires durable time-stamped sync report on disk.
 
 ## Use case map
 
