@@ -25,7 +25,7 @@ The domain decomposes into six **bounded contexts**, each with its own ubiquitou
 
 The **published language** between Editorial Review and Issue Resolution is the GitHub issue body conforming to the `wiki-docs.yml` template schema. This is the integration contract -- UC-02 produces issues in this format, UC-03 consumes them. No internal state is shared across the boundary.
 
-Agents are modeled as actors with **drives** -- behavioral tendencies that determine what each agent optimizes for (see [PHILOSOPHY.md](meta/PHILOSOPHY.md)). A writer's drive is production. A reviewer's drive is critique. A fact-checker's drive is verification. Where a single drive is insufficient to protect a concern, a separate actor with a complementary drive is introduced. This is the domain's answer to conflicts of interest: structural separation, not trust.
+Actors have **drives** -- behavioral tendencies that determine what each actor optimizes for (see [PHILOSOPHY.md](meta/PHILOSOPHY.md)). A creator's drive is production. A proofreader's drive is critique. A fact-checker's drive is verification. Where a single drive is insufficient to protect a concern, a separate actor with a complementary drive is introduced. This is the domain's answer to conflicts of interest: structural separation, not trust.
 
 Supporting documents: [PHILOSOPHY.md](meta/PHILOSOPHY.md) (design principles), [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) (cross-cutting rules), [TEMPLATE.md](meta/TEMPLATE.md) (use case structure), [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) (event catalog).
 

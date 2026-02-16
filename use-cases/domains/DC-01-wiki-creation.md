@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Owns the transition from an empty wiki to a populated wiki. The source code is explored, a wiki structure is proposed and approved by the user, and writer agents produce pages. This context assumes the wiki has no existing content pages -- restructuring an existing wiki belongs to [DC-06 Wiki Restructuring](DC-06-wiki-restructuring.md).
+Owns the transition from an empty wiki to a populated wiki. The source code is explored, a wiki structure is proposed and approved by the user, and creators produce pages. This context assumes the wiki has no existing content pages -- restructuring an existing wiki belongs to [DC-06 Wiki Restructuring](DC-06-wiki-restructuring.md).
 
 ## Ubiquitous language
 
-- **Exploration report** -- A structured summary of one facet of the source code (API surface, architecture, configuration), produced by an explorer agent.
-- **Wiki plan** -- A hierarchical structure of sections containing pages, each with filename, title, description, and key source files. Proposed by the planning agent, refined and approved by the user.
-- **Writer assignment** -- The input to a writer agent: page file path, title, description, key source files, audience, tone, and editorial guidance.
+- **Exploration report** -- A structured summary of one facet of the source code (API surface, architecture, configuration), produced by a researcher.
+- **Wiki plan** -- A hierarchical structure of sections containing pages, each with filename, title, description, and key source files. Proposed by the developmental editor, refined and approved by the user.
+- **Writer assignment** -- The input to a creator: page file path, title, description, key source files, audience, tone, and editorial guidance.
 
 ## Use cases
 

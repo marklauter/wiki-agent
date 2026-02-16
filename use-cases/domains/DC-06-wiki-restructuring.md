@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Owns the interactive restructuring of an existing wiki -- adding missing pages, removing obsolete pages, reorganizing sections, and updating navigation. Discovered as a gap during DC-01 (Wiki Creation) design: if writer agents partially fail, the wiki has content so `/init-wiki` refuses to run, and `/refresh-wiki` is not interactive.
+Owns the interactive restructuring of an existing wiki -- adding missing pages, removing obsolete pages, reorganizing sections, and updating navigation. Discovered as a gap during DC-01 (Wiki Creation) design: if creators partially fail, the wiki has content so `/init-wiki` refuses to run, and `/refresh-wiki` is not interactive.
 
 ## Use cases
 
