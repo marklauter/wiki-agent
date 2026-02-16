@@ -44,6 +44,12 @@ Agents communicate through meaningful state transitions, not function returns. A
 
 Name them. Define them. They are the integration points of the system.
 
+## Markdown is the wire format
+
+Protocols, domain events, reports, and assessments are all materialized as markdown. Not JSON. Not YAML. Not protocol buffers. The consumers are humans and LLM agents, and markdown is the format both read natively. Formal machine-readable schemas are not needed when every consumer is a capable reader.
+
+This is a deliberate choice, not a shortcut. A system whose integration points are optimized for human and AI consumption does not need a serialization layer between them.
+
 ## Obstacles over exceptions
 
 When something goes wrong, describe the threat to the goal — not the error code. "Source code is unreachable" tells you what's at risk. "Exit code 128" tells you nothing about what to do next.
@@ -69,3 +75,11 @@ Writers write. Explorers explore. Reviewers review. Orchestrators coordinate. An
 This is a corollary of drive separation. Each agent has one drive. A writer's drive is production. A reviewer's drive is critique. An agent with both drives will compromise between them — producing content that is "good enough" rather than content that is excellent and then separately verified. Two agents with opposing drives produce better outcomes than one agent trying to balance competing concerns.
 
 Separate judgment from execution. Separate analysis from mutation.
+
+## Extract, don't invent
+
+Use case design is Socratic. The designer asks questions; the domain expert has the answers. The designer's job is to draw out goals, constraints, and events that the expert already knows but hasn't structured — not to fabricate domain knowledge or infer requirements from silence.
+
+Work one phase at a time: goal, then invariants, then domain events, then scenario and obstacles. Summarize what you heard before moving on. If the answer is task-oriented ("it runs git pull"), redirect to intent ("what state does that achieve?"). If something contradicts a principle in this document, flag it.
+
+The user knows the domain. The designer knows how to structure it.
