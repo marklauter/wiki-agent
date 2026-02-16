@@ -52,15 +52,15 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates a wiki sync by running `/refresh-wiki`.
 2. **Orchestrator** -- Resolves the workspace and loads config (repo identity, source dir, wiki dir, audience, tone).
-3. **Orchestrator** -- Absorbs editorial context: reads editorial guidance, wiki instructions, and the target project's CLAUDE.md if it exists.
-4. **Orchestrator** -- Discovers all content pages in the wiki directory, excluding structural files (`_`-prefixed `.md` files). If no content pages exist, reports "nothing to sync" and stops.
+3. **Orchestrator** -- Absorbs editorial context for the target project.
+4. **Orchestrator** -- Discovers all content pages in the wiki directory. If no content pages exist, reports "nothing to sync" and stops.
 5. **Orchestrator** -- Identifies recent source code changes to provide as priority context for fact-checkers. This scopes attention, not coverage -- fact-checkers check all claims on every page, but recent changes tell them where drift is most likely.
-6. **Orchestrator** -- Dispatches fact-checker agents across all content pages. Each receives: the page path, the source directory, recent change context, audience, tone, and editorial guidance.
+6. **Orchestrator** -- Dispatches fact-checker agents across all content pages with source context and editorial guidance.
 7. **Fact-checker agents** -- Each reads its assigned wiki page, identifies all sources of truth (source code files referenced or implied by the content, external URLs, linked resources), and verifies every factual claim. Each claim is assessed as: verified (accurate against source), inaccurate (with the correct fact and source reference), or unverifiable (source unreachable, with the source that could not be reached).
    --> DriftDetected (one per inaccurate claim found)
    --> DriftSkipped (one per unverifiable claim)
 8. **Orchestrator** -- Collects all fact-checker assessments. For pages where all claims are verified and no drift was detected, records them as up-to-date. For pages with drift, dispatches writer agents.
-9. **Writer agents** -- Each reads the page, reads the fact-checker's assessment, reads the cited source files to independently verify accuracy, and applies targeted corrections using the Edit tool. For each correction, the writer reports what changed and cites the source reference.
+9. **Writer agents** -- Each reads the page, reads the fact-checker's assessment, reads the cited source files to independently verify accuracy, and applies targeted corrections. For each correction, the writer reports what changed and cites the source reference.
    --> DriftCorrected (one per applied correction)
 10. **Orchestrator** -- Compiles the sync report from all domain events (DriftDetected, DriftCorrected, DriftSkipped) and writes it to disk as a time-stamped report.
     --> WikiSynced
@@ -142,4 +142,7 @@ The writer reads the cited source file and finds that the wiki is actually corre
 - **Implementation gap: command file supports `-plan` flag.** The use case removes this. The command file should be updated.
 - **Implementation gap: command file uses "last 50 commits" heuristic.** The use case says "recent source code changes" without prescribing a specific commit count. The implementation may use 50 commits, HEAD-based diffs, or date-based ranges -- this is an implementation detail.
 - **Implementation gap: command file has no report output.** The command file produces a console summary table but does not write a durable report to disk. The use case requires a persistent, time-stamped sync report.
+- **Implementation: editorial context sources.** Step 3 absorbs editorial context from: editorial guidance (`.claude/guidance/editorial-guidance.md`), wiki instructions (`.claude/guidance/wiki-instructions.md`), and the target project's CLAUDE.md if it exists (`{sourceDir}/CLAUDE.md`).
+- **Implementation: content page discovery.** Step 4 identifies content pages by excluding structural files -- those prefixed with `_` (e.g., `_Sidebar.md`, `_Footer.md`).
+- **Implementation: fact-checker dispatch.** Step 6 provides each fact-checker agent with: the page path, the source directory, recent change context, audience, tone, and editorial guidance.
 - **Relationship to other use cases:** UC-04 requires UC-05 (Provision Workspace) as a prerequisite. It typically follows UC-01 (Populate New Wiki) -- there must be content pages to sync. Its corrections may render UC-02 accuracy findings stale (accepted gap). It has no dependency on UC-03 (Resolve Documentation Issues) but shares the writer agent protocol. It has no dependency on UC-06 (Decommission Workspace).

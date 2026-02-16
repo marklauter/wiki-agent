@@ -51,16 +51,16 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates wiki population by running `/init-wiki`.
 2. **Orchestrator** -- Resolves the workspace and loads config (repo identity, source dir, wiki dir, audience, tone).
-3. **Orchestrator** -- Confirms the wiki is brand new -- no content pages exist in the wiki directory. Structural files (Home.md, _Sidebar.md, _Footer.md) are ignored.
-4. **Orchestrator** -- Absorbs editorial context: reads guidance files and the target project's CLAUDE.md if it exists.
+3. **Orchestrator** -- Confirms the wiki is brand new -- no content pages exist in the wiki directory.
+4. **Orchestrator** -- Absorbs editorial context for the target project.
 5. **Orchestrator** -- Dispatches explorer agents to comprehend the source code from distinct angles.
 6. **Explorer agents** -- Each reads the source code thoroughly and produces a structured report covering its assigned facet.
 7. **Orchestrator** -- Collects all exploration reports.
-8. **Planning agent** -- Synthesizes the exploration reports into a proposed wiki structure: sections containing pages, each with filename, title, description, and key source files.
+8. **Planning agent** -- Synthesizes the exploration reports into a proposed wiki structure.
 9. **User** -- Reviews the proposed wiki structure and refines it through conversation with the orchestrator. Pages are added, removed, or reorganized until the user is satisfied with the plan.
-10. **Orchestrator** -- Dispatches writer agents, one per approved page (excluding _Sidebar.md), each receiving its page assignment, key source file references, audience, tone, and editorial guidance.
+10. **Orchestrator** -- Dispatches writer agents with their page assignments and editorial context.
 11. **Writer agents** -- Each reads the assigned source files and writes one wiki page to disk.
-12. **Orchestrator** -- Collects all writer results, writes _Sidebar.md with navigation reflecting the approved section structure, and confirms all approved pages are on disk.
+12. **Orchestrator** -- Collects all writer results, assembles wiki navigation, and confirms all approved content is in place.
     --> WikiPopulated
 13. **User** -- Sees a summary: pages created organized by section, wiki structure, and suggested next steps (review pages for accuracy, run `/proofread-wiki` for editorial review, run `/save` to publish). The summary notes that content accuracy has not been independently verified.
 
@@ -124,4 +124,7 @@ One or more writer agents fail to write their assigned page. Successfully writte
 - **Implementation note: AskUserQuestion may be too limited.** The current command file uses `AskUserQuestion` for plan approval, which presents options rather than enabling free-form conversation. This may be insufficient for the iterative design conversation envisioned in step 9. Acceptable as a first pass for MVP, but a richer interaction pattern may be needed.
 - **Partial completion creates a design gap.** If writer agents partially fail (step 11a), the wiki has some content but not all. The user cannot re-run `/init-wiki` because the "new wikis only" invariant blocks it. A future use case for interactive wiki refactoring would address this gap. For now, the user's options are to manually clear the wiki directory and retry, or to work with the partial content.
 - **Audience and tone design tension.** The current model treats audience and tone as single values for the entire wiki. Different sections may warrant different audiences (e.g., library users vs. repository contributors). Noted as a future design consideration -- for now, the single-value model holds.
+- **Implementation: editorial context sources.** Step 4 absorbs editorial context from: editorial guidance (`.claude/guidance/editorial-guidance.md`), wiki instructions (`.claude/guidance/wiki-instructions.md`), and the target project's CLAUDE.md if it exists (`{sourceDir}/CLAUDE.md`).
+- **Implementation: writer dispatch.** Step 10 dispatches one writer agent per approved page. `_Sidebar.md` is excluded from writer dispatch -- the orchestrator writes it directly in step 12.
+- **Implementation: wiki navigation.** Step 12 writes `_Sidebar.md` with navigation links reflecting the approved section structure, then verifies all approved pages exist on disk.
 - **Relationship to other use cases:** UC-01 requires UC-05 (Provision Workspace) as a prerequisite. Its output feeds UC-02 (Review Wiki Quality) and UC-04 (Sync Wiki with Source Changes). It has no dependency on UC-03 (Resolve Documentation Issues) or UC-06 (Decommission Workspace).

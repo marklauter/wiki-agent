@@ -65,20 +65,19 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates a wiki review by running `/proofread-wiki`.
 2. **Orchestrator** -- Resolves the workspace and loads config (repo identity, source dir, wiki dir, audience, tone).
-3. **Orchestrator** -- Absorbs editorial context: reads editorial guidance, wiki instructions, issue template, and the target project's CLAUDE.md if it exists.
-4. **Orchestrator** -- Discovers all content pages in the wiki directory, excluding structural files (`_`-prefixed `.md` files). If no content pages exist, reports "nothing to review" and stops.
-5. **Orchestrator** -- Dispatches explorer agents to build a project summary from the source code. Explorers examine the source from distinct domain facets -- at minimum the public API surface, architecture, and configuration -- and write structured summaries to the proofread cache.
+3. **Orchestrator** -- Absorbs editorial context for the target project.
+4. **Orchestrator** -- Discovers all content pages in the wiki directory. If no content pages exist, reports "nothing to review" and stops.
+5. **Orchestrator** -- Dispatches explorer agents to build a project summary from the source code.
 6. **Explorer agents** -- Each reads the source code and produces a summary covering its assigned facet.
 7. **Orchestrator** -- Dispatches reviewer agents across all four editorial lenses. Each lens is applied to the wiki content.
-8. **Reviewer agents** -- Each examines the wiki through its assigned editorial lens, using project summaries and source code as reference. Each problem found is written to the proofread cache as a finding.
+8. **Reviewer agents** -- Each examines the wiki through its assigned editorial lens, using project summaries and source code as reference. Each problem found is surfaced as a finding.
    --> IssueIdentified (one per finding)
-9. **Deduplicator agent** -- Reads all findings from the cache. Reads all open GitHub issues labeled `documentation`. Drops findings that clearly match existing open issues. Produces the set of findings to be filed.
+9. **Deduplicator agent** -- Collects all findings from the current review. Reads all open GitHub issues labeled `documentation`. Drops findings that clearly match existing open issues. Produces the set of findings to be filed.
    --> IssueToBeFiled (one per surviving finding)
 10. **Orchestrator** -- Files one GitHub issue per IssueToBeFiled event, using the issue template format.
     --> FindingFiled (one per issue)
-11. **Orchestrator** -- Cleans up the proofread cache.
     --> WikiReviewed
-12. **User** -- Sees the review summary: what is strong, issues filed, unverified items, clean pages, failed reviews, failed filings.
+11. **User** -- Sees the review summary: what is strong, issues filed, unverified items, clean pages, failed reviews, failed filings.
 
 ## Goal obstacles
 
@@ -162,4 +161,7 @@ The `file-issue.sh` script fails for a specific finding after its internal retry
 - **Sidebar validation is reviewer work.** Sidebar structural integrity (orphan pages, broken links) is checked by the structure lens reviewer, not by the orchestrator. The orchestrator orchestrates; reviewers review.
 - **GitHub is a sub-system.** GitHub Issues serves as the system's durable event store for findings. The issue is the published fact that UC-03 (Resolve Documentation Issues) consumes. This framing means GitHub unreachability is a system degradation, not an external dependency failure.
 - **Local fallback path.** When GitHub is unreachable or individual filings fail, issues are written to `workspace/reviews/{owner}/{repo}/{date-time}/` -- outside both the source clone and wiki clone. This keeps the source clone clean (readonly invariant) and the wiki clone uncontaminated by review artifacts.
+- **Implementation: editorial context sources.** Step 3 absorbs editorial context from: editorial guidance (`.claude/guidance/editorial-guidance.md`), wiki instructions (`.claude/guidance/wiki-instructions.md`), the issue template (`.github/ISSUE_TEMPLATE/wiki-docs.yml`), and the target project's CLAUDE.md if it exists (`{sourceDir}/CLAUDE.md`).
+- **Implementation: content page discovery.** Step 4 identifies content pages by excluding structural files -- those prefixed with `_` (e.g., `_Sidebar.md`, `_Footer.md`).
+- **Implementation: proofread cache.** Explorer summaries (step 5), reviewer findings (step 8), and deduplicated results (step 9) are coordinated through the proofread cache (`.proofread/{repo}/`). The cache is created at the start of a run and cleaned up when the review completes. See the "Proofread cache is ephemeral" invariant.
 - **Relationship to other use cases:** UC-02 requires UC-05 (Provision Workspace) as a prerequisite and typically follows UC-01 (Populate New Wiki), though it can review any populated wiki. Its output (FindingFiled) feeds UC-03 (Resolve Documentation Issues) via the issue body protocol. It has no dependency on UC-04 (Sync Wiki with Source Changes) or UC-06 (Decommission Workspace).

@@ -40,9 +40,9 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates decommissioning by running `/down`.
 2. **System** -- Resolves which workspace to decommission using the standard workspace selection procedure.
-3. **System** -- Reads the workspace config to locate the source and wiki directories.
+3. **System** -- Identifies the workspace components to remove.
 4. **System** -- Checks the wiki working tree for uncommitted changes and unpushed commits.
-5. **System** -- Removes the source clone, wiki clone, config file, and empty parent directories.
+5. **System** -- Removes all workspace artifacts.
    --> WorkspaceDecommissioned
 6. **User** -- Sees confirmation of what was removed.
 
@@ -90,4 +90,6 @@ The wiki working tree has uncommitted changes, unpushed commits, or both. This i
 - **Source clone has no safety concern.** The source repo is readonly (invariant from UC-05). It was never mutated, so it can always be deleted without data loss. Only the wiki clone requires a safety check.
 - **Scripts own deterministic behavior.** (See [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md).) The safety check (`check-wiki-safety.sh`) and removal (`remove-workspace.sh`) are separate scripts by design. The safety check produces a report; the removal script acts on it. The `/down` command should delegate to both scripts rather than inlining git commands.
 - **Implementation gap: command vs. use case reconciliation.** The current `/down` command file supports `--force`, `--all`, and inlines git commands rather than delegating to scripts. It also uses a simple "proceed or abort" confirmation rather than requiring the user to type the repo name. The command file should be updated to match this use case: single workspace, always check safety, type-to-confirm, delegate to scripts.
+- **Implementation: workspace discovery.** Step 3 reads `workspace.config.yml` to locate the source and wiki directory paths.
+- **Implementation: workspace removal.** Step 5 removes the source clone, wiki clone, config file, and empty parent directories under `workspace/config/` and `workspace/`.
 - **Relationship to other use cases:** UC-06 is the inverse of UC-05 (Provision Workspace). It has no direct relationship to the editorial use cases (UC-01 through UC-04) -- it simply removes the workspace they operate on. If the user has unpublished wiki work, they should commit and push their changes using git before decommissioning.

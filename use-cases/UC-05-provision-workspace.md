@@ -39,7 +39,7 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates provisioning by running `/up`.
 2. **User** -- Provides the source repository clone URL, target audience, and writing tone in response to the interview prompts.
-3. **System** -- Extracts repository identity (owner and repo name) from the clone URL.
+3. **System** -- Identifies the target repository from the provided clone URL.
 4. **System** -- Confirms no workspace exists for this repository.
 5. **System** -- Validates that the source repository exists on GitHub.
 6. **System** -- Validates that the wiki repository exists on GitHub.
@@ -101,4 +101,5 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 - **Scripts own deterministic behavior.** (See [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md).) The clone script (`clone-workspace.sh`) is the single source of truth for provisioning mechanics. The `/up` command should delegate to it after collecting user inputs.
 - **Implementation gap: command vs. script reconciliation.** The `/up` command file and `clone-workspace.sh` currently implement the same logic independently. The command file writes config before cloning; the script clones first then writes config. The script's ordering is safer (no orphaned config on clone failure). This use case follows the script's ordering and the command should be updated to delegate to the script.
 - **Audience and tone are immutable.** There is currently no edit path for these values. Changing them requires `/down` then `/up`.
+- **Implementation: repository identification.** Step 3 extracts the owner and repository name by parsing the clone URL (supports both HTTPS and SSH formats).
 - **Relationship to other use cases:** UC-05 is a prerequisite for UC-01 (Populate New Wiki), UC-02 (Review Wiki Quality), UC-03 (Resolve Documentation Issues), and UC-04 (Sync Wiki with Source Changes). UC-06 (Decommission Workspace) is its inverse. UC-07 (Publish Wiki Changes) is out of scope -- users commit and push using their own git tools.

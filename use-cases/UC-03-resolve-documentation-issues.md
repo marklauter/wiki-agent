@@ -54,12 +54,12 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 1. **User** -- Initiates remediation by running `/resolve-issues`.
 2. **Orchestrator** -- Resolves the workspace and loads config (repo identity, source dir, wiki dir, audience, tone).
-3. **Orchestrator** -- Absorbs editorial context: reads editorial guidance, wiki instructions, and the target project's CLAUDE.md if it exists.
+3. **Orchestrator** -- Absorbs editorial context for the target project.
 4. **Orchestrator** -- Fetches all open GitHub issues labeled `documentation` for this repository.
-5. **Orchestrator** -- Parses each issue body against the `wiki-docs.yml` template schema, extracting structured fields: Page, Editorial lens, Severity, Finding, Recommendation, Source file, Notes. Issues that lack required structured fields are set aside as unapplicable.
-6. **Orchestrator** -- Groups actionable issues by wiki page. For accuracy issues, notes the referenced source files that fixers will need to read.
-7. **Orchestrator** -- Dispatches fixer agents, one per wiki page that has issues. Each receives: the page path, the list of parsed issues for that page, source file paths for accuracy issues, editorial guidance, audience, and tone.
-8. **Fixer agents** -- Each reads the wiki page, reads source files for accuracy issues, and applies each recommendation using targeted edits. For each issue, the fixer reports: applied (with a description of the change) or skipped (with reason).
+5. **Orchestrator** -- Extracts actionable information from each issue. Issues that lack required structured fields are set aside as unapplicable.
+6. **Orchestrator** -- Organizes actionable issues for remediation.
+7. **Orchestrator** -- Dispatches fixer agents with their page assignments and context.
+8. **Fixer agents** -- Each reads the wiki page, reads source files for accuracy issues, and applies each recommended correction. For each issue, the fixer reports: applied (with a description of the change) or skipped (with reason).
    --> IssueCorrected (one per applied issue)
    --> IssueSkipped (one per skipped issue)
 9. **Orchestrator** -- For applied issues, closes the GitHub issue with a comment noting the correction. For skipped issues, comments on the GitHub issue explaining why it was skipped. For issues skipped due to ambiguity or need for clarification, also adds the `needs-clarification` label.
@@ -153,4 +153,7 @@ The fix was applied to the wiki file on disk, but the GitHub API call to close o
 - **Implementation gap: command file uses old terminology.** The command file references "Pass" in the parsed fields. The issue template uses "Editorial lens." The command file should be updated to match.
 - **Implementation gap: command file supports `-plan` and scope arguments.** The use case removes these. The command file should be updated to remediate all open actionable issues without scope selection.
 - **Implementation gap: command file uses `docs` label reference.** The command file description mentions "docs-labeled" issues. The actual label is `documentation` (matching the issue template). Terminology should be aligned.
+- **Implementation: editorial context sources.** Step 3 absorbs editorial context from: editorial guidance (`.claude/guidance/editorial-guidance.md`), wiki instructions (`.claude/guidance/wiki-instructions.md`), and the target project's CLAUDE.md if it exists (`{sourceDir}/CLAUDE.md`).
+- **Implementation: issue parsing.** Step 5 parses each issue body against the `wiki-docs.yml` template schema, extracting structured fields: Page, Editorial lens, Severity, Finding, Recommendation, Source file, Notes. The field schema is defined in the Protocols section.
+- **Implementation: fixer dispatch.** Step 6 groups actionable issues by wiki page and notes source file references for accuracy issues. Step 7 dispatches one fixer agent per wiki page, providing the page path, parsed issues, source file paths, editorial guidance, audience, and tone.
 - **Relationship to other use cases:** UC-03 requires UC-05 (Provision Workspace) as a prerequisite. It consumes FindingFiled events from UC-02 (Review Wiki Quality) via GitHub Issues. It has no dependency on UC-01 (Populate New Wiki), UC-04 (Sync Wiki with Source Changes), or UC-06 (Decommission Workspace). UC-02 and UC-03 share a published protocol (the issue body schema) but operate independently -- they do not share internal state.
