@@ -2,7 +2,7 @@
 
 Every term that has precise meaning within the use case model. If a word means something specific here -- and especially if it means something different from its everyday usage -- it belongs in this list. Bounded contexts have their own ubiquitous language (defined in their [DC files](domains/)); this glossary captures terms that span the model or deliberately narrow common meaning.
 
-Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOPHY.md](PHILOSOPHY.md) or its own artifact.
+Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOPHY.md](meta/PHILOSOPHY.md) or its own artifact.
 
 ---
 
@@ -18,11 +18,11 @@ Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOP
 
 **Commands do not chain** -- Cross-cutting invariant: each command (`/up`, `/down`, `/init-wiki`, etc.) is self-contained and never invokes another command.
 
-**Content Mutator** -- Abstract agent archetype whose defining trait is wiki write permission; children are creators (writers) and correctors (fixers), distinguished by the nature of their judgment.
+**Content Mutator** -- Abstract agent archetype whose defining trait is wiki write permission; children are creators (writers) and correctors, distinguished by the nature of their judgment.
 
 **Content page** -- A wiki page that is not a structural file; the unit of editorial work in UC-02, UC-03, and UC-04.
 
-**Correction assignment** -- The input to a fixer or writer agent: page path, finding, recommendation, and source reference; structurally compatible between DC-03 and DC-04, enabling agent reuse.
+**Correction assignment** -- The input to a corrector agent: page path, finding, recommendation, and source reference; structurally compatible between DC-03 and DC-04, enabling agent reuse.
 
 **Deduplication** -- Comparing new findings against existing open GitHub issues labeled `documentation` to prevent filing duplicates; only drops a finding when it clearly matches an existing open issue about the same problem.
 
@@ -82,7 +82,7 @@ Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOP
 
 **Severity** -- Classification of a finding: must-fix or suggestion.
 
-**Skip reason** -- Why a fixer could not apply a recommendation: quoted text no longer exists, recommendation is ambiguous, or recommendation contradicts source code.
+**Skip reason** -- Why a corrector could not apply a recommendation: quoted text no longer exists, recommendation is ambiguous, or recommendation contradicts source code.
 
 **Source clone** -- A readonly clone of the source repository used as reference material; never staged, committed, or pushed to.
 
@@ -96,7 +96,7 @@ Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOP
 
 **Sync report** -- A durable, time-stamped markdown file at `workspace/reports/{owner}/{repo}/{date-time}/sync-report.md` showing corrections applied, pages verified, and claims that could not be checked; reports accumulate across runs.
 
-**Targeted edit** -- A surgical change to a specific section of a wiki page, preserving surrounding content; the required editing style for fixer agents in UC-03 and writer agents in UC-04.
+**Targeted edit** -- A surgical change to a specific section of a wiki page, preserving surrounding content; the required editing style for corrector agents in UC-03 and UC-04.
 
 **Tone** -- The writing style for the wiki, configured per workspace (e.g., "reference-style", "tutorial-style") and honored by every agent that produces content.
 

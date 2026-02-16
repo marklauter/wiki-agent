@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Owns the remediation of documented problems tracked in GitHub Issues. Fixer agents apply recommended corrections to wiki pages. Issue closure is a consequence of successful remediation, not the goal. This context consumes the published protocol from [DC-02 Editorial Review](DC-02-editorial-review.md).
+Owns the remediation of documented problems tracked in GitHub Issues. Corrector agents apply recommended corrections to wiki pages. Issue closure is a consequence of successful remediation, not the goal. This context consumes the published protocol from [DC-02 Editorial Review](DC-02-editorial-review.md).
 
 ## Ubiquitous language
 
-- **Fixer agent** -- An agent with a remediation drive that applies recommended corrections to a wiki page.
+- **Corrector agent** -- An agent with a remediation drive that applies recommended corrections to a wiki page.
 - **Targeted edit** -- A surgical change to a specific section of a wiki page, preserving surrounding content.
-- **Skip reason** -- Why a fixer could not apply a recommendation: quoted text no longer exists, recommendation is ambiguous, recommendation contradicts source code.
-- **Correction assignment** -- The input to a fixer or writer agent: page path, finding (what's wrong), recommendation (what it should say), source reference (the authority). Structurally compatible with [DC-04 Drift Detection](DC-04-drift-detection.md)'s correction assignments, enabling writer agent reuse.
+- **Skip reason** -- Why a corrector could not apply a recommendation: quoted text no longer exists, recommendation is ambiguous, recommendation contradicts source code.
+- **Correction assignment** -- The input to a corrector agent: page path, finding (what's wrong), recommendation (what it should say), source reference (the authority). Structurally compatible with [DC-04 Drift Detection](DC-04-drift-detection.md)'s correction assignments, enabling corrector agent reuse.
 
 ## Use cases
 
@@ -27,4 +27,4 @@ Owns the remediation of documented problems tracked in GitHub Issues. Fixer agen
 
 - **Requires:** [DC-05 Workspace Lifecycle](DC-05-workspace-lifecycle.md) -- workspace must be provisioned.
 - **Consumes from:** [DC-02 Editorial Review](DC-02-editorial-review.md) -- GitHub issues conforming to `wiki-docs.yml` schema.
-- **Shares with:** [DC-04 Drift Detection](DC-04-drift-detection.md) -- writer agent protocol is structurally compatible.
+- **Shares with:** [DC-04 Drift Detection](DC-04-drift-detection.md) -- corrector agent protocol is structurally compatible.

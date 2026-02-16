@@ -1,6 +1,6 @@
 # Actor Catalog
 
-Every actor that interacts with or operates within this system — who they are, what they want, and where they appear. Primary actors are framed using Alan Cooper's goal-oriented design: life goals (who they want to be), experience goals (how they want to feel), and end goals (what they want to accomplish). Supporting actors have *drives*: behavioral tendencies they optimize for in service of the primary actor's goals. A drive that is insufficient to protect a goal is why a separate actor exists. See [PHILOSOPHY.md](PHILOSOPHY.md) for the full treatment.
+Every actor that interacts with or operates within this system — who they are, what they want, and where they appear. Primary actors are framed using Alan Cooper's goal-oriented design: life goals (who they want to be), experience goals (how they want to feel), and end goals (what they want to accomplish). Supporting actors have *drives*: behavioral tendencies they optimize for in service of the primary actor's goals. A drive that is insufficient to protect a goal is why a separate actor exists. See [PHILOSOPHY.md](meta/PHILOSOPHY.md) for the full treatment.
 
 UC-07 (Publish Wiki Changes) is out of scope and excluded.
 
@@ -40,7 +40,7 @@ UC-07 (Publish Wiki Changes) is out of scope and excluded.
 
 ## Agent actors
 
-Agents appear only in the editorial use cases (UC-01 through UC-04). Each agent has a single drive — a behavioral tendency it optimizes for. Drives are not goals; they are what make agents predictable and what reveal where they fall short. When a single drive cannot protect the primary actor's goal, separate agents exist. See [PHILOSOPHY.md](PHILOSOPHY.md), "Drives explain separation."
+Agents appear only in the editorial use cases (UC-01 through UC-04). Each agent has a single drive — a behavioral tendency it optimizes for. Drives are not goals; they are what make agents predictable and what reveal where they fall short. When a single drive cannot protect the primary actor's goal, separate agents exist. See [PHILOSOPHY.md](meta/PHILOSOPHY.md), "Drives explain separation."
 
 Agents divide into two families defined by their relationship to wiki content — plus two that stand alone.
 
@@ -127,13 +127,15 @@ Receives a page assignment with source file references from the orchestrator. Re
 
 Each receives a page assignment with source file references, audience, tone, and editorial guidance, then reads the source files and writes one wiki page. The writer optimizes for coverage and clarity, not for catching its own mistakes. This drive is insufficient to guarantee accuracy — which is why UC-02 exists with a separate critique drive.
 
-#### Fixer agents (Corrector)
+#### Corrector agents
 
 - **Drive:** Remediation.
 - **Agent type:** `wiki-writer` (reused)
 - **Appears in:** UC-03, UC-04
 
-Each receives a wiki page, its associated findings, and source file references, then applies targeted corrections using the Edit tool. The fixer's drive is to apply known fixes to known problems — it does not discover new problems (UC-02's critique drive) and does not create new content (UC-01's production drive). When a recommendation contradicts source code or is ambiguous, the fixer skips rather than guesses.
+Named for the *corrector of the press* — the person in a traditional print shop who took the proofreader's marked-up proofs and emended the typeset text. The corrector did not discover errors (that was the proofreader's work) and did not compose new copy (that was the writer's work). The corrector applied known corrections faithfully and mechanically.
+
+Each receives a wiki page, its associated findings, and source file references, then emends the wiki content using targeted edits. When a recommendation contradicts source code or is ambiguous, the corrector skips rather than guesses.
 
 UC-03 and UC-04 both consume the same protocol: a page, a finding (what's wrong), a recommendation (what it should say), and a source reference (the authority). The shared protocol enables agent reuse across bounded contexts.
 
@@ -173,7 +175,7 @@ Git provides repository cloning, change detection, and the post-hoc approval gat
 | ↳ Deduplicator | Filtering | — | S | — | — | — | — |
 | *«Content Mutator»* | *wiki modification* | *S* | — | *S* | *S* | — | — |
 | ↳ Writer agents | Production | S | — | — | — | — | — |
-| ↳ Fixer agents | Remediation | — | — | S | S | — | — |
+| ↳ Corrector agents | Remediation | — | — | S | S | — | — |
 
 **P** = primary actor, **S** = supporting actor, **—** = not involved, *italics* = abstract (not instantiated directly)
 

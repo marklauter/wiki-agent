@@ -24,5 +24,5 @@ Owns the critique of existing wiki content across four editorial lenses: structu
 ## Integration points
 
 - **Requires:** [DC-05 Workspace Lifecycle](DC-05-workspace-lifecycle.md) -- workspace must be provisioned.
-- **Publishes to:** [DC-03 Issue Resolution](DC-03-issue-resolution.md) -- findings filed as GitHub issues are consumed by fixers.
+- **Publishes to:** [DC-03 Issue Resolution](DC-03-issue-resolution.md) -- findings filed as GitHub issues are consumed by correctors.
 - **Gap:** Accuracy findings may become stale if DC-04 (Drift Detection) independently corrects the same inaccuracy. Accepted trade-off.

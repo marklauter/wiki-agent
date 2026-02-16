@@ -8,18 +8,20 @@ Every real problem in the wiki -- inaccuracies against source code, structural w
 
 - **Bounded context:** [DC-02 Editorial Review](domains/DC-02-editorial-review.md)
 - **Primary actor:** User
-- **Supporting actors:** Orchestrator (`/proofread-wiki` command), Explorer agents (wiki-explorer), Reviewer agents (one per editorial lens), Deduplicator agent
+- **Supporting actors:** [Orchestrator](ACTOR-CATALOG.md#orchestrator) (`/proofread-wiki` command), [Explorer agents](ACTOR-CATALOG.md#explorer-agents) (wiki-explorer), [Reviewer agents](ACTOR-CATALOG.md#reviewer-agents) (one per editorial lens), [Deduplicator agent](ACTOR-CATALOG.md#deduplicator-agent)
 - **Trigger:** The user has a populated wiki (UC-01 or manually authored) and wants an independent editorial review.
 
 ## Agent responsibilities
 
+See also: [ACTOR-CATALOG.md](ACTOR-CATALOG.md) for full actor definitions, drives, and the appearance matrix.
+
 Each agent has a single drive. Separation exists because no single drive can protect all the concerns at play. The reviewer's critique drive is the complement to UC-01's production drive -- not because the writer is malicious, but because a single drive cannot serve competing concerns.
 
-- **Orchestrator** -- Drive: coordination. Resolves the workspace, absorbs editorial context, dispatches explorers and reviewers, collects results, files issues, cleans up the cache, and presents the summary. The orchestrator makes no editorial judgments and performs no reviews.
+- **[Orchestrator](ACTOR-CATALOG.md#orchestrator)** -- Drive: coordination. Resolves the workspace, absorbs editorial context, dispatches explorers and reviewers, collects results, files issues, cleans up the cache, and presents the summary. The orchestrator makes no editorial judgments and performs no reviews.
 
-- **Explorer agents** -- Drive: comprehension. Each examines the source code from a distinct domain facet and produces a structured summary. At minimum three facets: the public API surface (exported components -- public classes, interfaces, entry points), architecture (components, abstractions, data flows), and configuration (options, constraints, limitations, edge cases). Additional facets may be warranted for some projects. Explorers are read-only -- they never modify files. Their summaries serve as shared context for all reviewers.
+- **[Explorer agents](ACTOR-CATALOG.md#explorer-agents)** -- Drive: comprehension. Each examines the source code from a distinct domain facet and produces a structured summary. At minimum three facets: the public API surface (exported components -- public classes, interfaces, entry points), architecture (components, abstractions, data flows), and configuration (options, constraints, limitations, edge cases). Additional facets may be warranted for some projects. Explorers are read-only -- they never modify files. Their summaries serve as shared context for all reviewers.
 
-- **Reviewer agents** -- Drive: critique. Each examines the wiki content through one editorial lens. There are four lenses, each representing a distinct editorial discipline:
+- **[Reviewer agents](ACTOR-CATALOG.md#reviewer-agents)** -- Drive: critique. Each examines the wiki content through one editorial lens. There are four lenses, each representing a distinct editorial discipline:
 
   - **Structure lens** -- Organization, flow, gaps, redundancies. Requires whole-wiki visibility to assess how pages relate, where content is missing, and where it overlaps. Sidebar structural integrity (orphan pages, broken links) is checked here.
   - **Line lens** -- Sentence-level clarity, tightening, transitions. Page-local work. Each page is examined independently.
@@ -28,7 +30,7 @@ Each agent has a single drive. Separation exists because no single drive can pro
 
   A reviewer that finds nothing wrong reports that the content is clean. An editor who nitpicks everything is as unhelpful as one who misses real problems. The drive is to find real problems, not to generate findings.
 
-- **Deduplicator agent** -- Drive: filtering. Compares findings against existing open GitHub issues labeled `documentation`. Its job is to prevent duplicate issues -- not to suppress legitimate findings. Only drops a finding when it clearly matches an existing open issue about the same problem. A finding about a different section of the same page is not a duplicate.
+- **[Deduplicator agent](ACTOR-CATALOG.md#deduplicator-agent)** -- Drive: filtering. Compares findings against existing open GitHub issues labeled `documentation`. Its job is to prevent duplicate issues -- not to suppress legitimate findings. Only drops a finding when it clearly matches an existing open issue about the same problem. A finding about a different section of the same page is not a duplicate.
 
 ## Invariants
 

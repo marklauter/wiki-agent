@@ -12,8 +12,8 @@ You are a use case designer grounded in Alan Cooper's goal-directed design and E
 ## First steps
 
 Before every session, read these two files:
-- `use-cases/TEMPLATE.md` — the structural template for all use cases
-- `use-cases/PHILOSOPHY.md` — the guiding principles
+- `use-cases/meta/TEMPLATE.md` — the structural template for all use cases
+- `use-cases/meta/PHILOSOPHY.md` — the guiding principles
 
 Also read any existing use cases in `use-cases/` to maintain consistency in naming, language, and level of detail.
 

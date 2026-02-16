@@ -8,20 +8,22 @@ A project's empty wiki is populated with a complete, well-structured set of docu
 
 - **Bounded context:** [DC-01 Wiki Creation](domains/DC-01-wiki-creation.md)
 - **Primary actor:** User
-- **Supporting actors:** Orchestrator (`/init-wiki` command), Explorer agents (wiki-explorer), Planning agent (general-purpose), Writer agents (wiki-writer)
+- **Supporting actors:** [Orchestrator](ACTOR-CATALOG.md#orchestrator) (`/init-wiki` command), [Explorer agents](ACTOR-CATALOG.md#explorer-agents) (wiki-explorer), [Planning agent](ACTOR-CATALOG.md#planning-agent) (general-purpose), [Writer agents](ACTOR-CATALOG.md#writer-agents-creator) (wiki-writer)
 - **Trigger:** The user has provisioned a workspace (UC-05) and wants to create wiki documentation for a project that does not yet have any.
 
 ## Agent responsibilities
 
+See also: [ACTOR-CATALOG.md](ACTOR-CATALOG.md) for full actor definitions, drives, and the appearance matrix.
+
 Each agent has a single drive. Separation exists because no single drive can protect all the concerns at play.
 
-- **Orchestrator** -- Drive: coordination. Resolves the workspace, validates the wiki is new, distributes context to agents, dispatches explorers and writers, collects results, writes _Sidebar.md, and presents the summary. The orchestrator makes no editorial judgments -- it delegates comprehension to explorers, synthesis to the planner, and production to writers.
+- **[Orchestrator](ACTOR-CATALOG.md#orchestrator)** -- Drive: coordination. Resolves the workspace, validates the wiki is new, distributes context to agents, dispatches explorers and writers, collects results, writes _Sidebar.md, and presents the summary. The orchestrator makes no editorial judgments -- it delegates comprehension to explorers, synthesis to the planner, and production to writers.
 
-- **Explorer agents** -- Drive: comprehension. Each examines the source code from a distinct angle and produces a structured report. Explorers are read-only -- they never modify files. Each instance's drive is to understand its assigned facet thoroughly, citing specific files and line numbers.
+- **[Explorer agents](ACTOR-CATALOG.md#explorer-agents)** -- Drive: comprehension. Each examines the source code from a distinct angle and produces a structured report. Explorers are read-only -- they never modify files. Each instance's drive is to understand its assigned facet thoroughly, citing specific files and line numbers.
 
-- **Planning agent** -- Drive: synthesis. Receives all exploration reports and produces a coherent wiki structure -- sections containing pages, each with a filename, title, description, and key source files. The planner's drive is to turn raw understanding into a structure that serves the audience. It does not write content; it organizes.
+- **[Planning agent](ACTOR-CATALOG.md#planning-agent)** -- Drive: synthesis. Receives all exploration reports and produces a coherent wiki structure -- sections containing pages, each with a filename, title, description, and key source files. The planner's drive is to turn raw understanding into a structure that serves the audience. It does not write content; it organizes.
 
-- **Writer agents** -- Drive: production. Each receives a page assignment with source file references, audience, tone, and editorial guidance, then reads the source files and writes one wiki page. The writer's drive is to produce well-structured, readable content. This drive is insufficient to guarantee accuracy on its own -- which is exactly why UC-02 (Review Wiki Quality) exists as a separate use case with a critique drive. Within UC-01, the writer reads source code before writing (invariant), but the production drive means it optimizes for coverage and clarity, not for catching its own mistakes.
+- **[Writer agents](ACTOR-CATALOG.md#writer-agents-creator)** -- Drive: production. Each receives a page assignment with source file references, audience, tone, and editorial guidance, then reads the source files and writes one wiki page. The writer's drive is to produce well-structured, readable content. This drive is insufficient to guarantee accuracy on its own -- which is exactly why UC-02 (Review Wiki Quality) exists as a separate use case with a critique drive. Within UC-01, the writer reads source code before writing (invariant), but the production drive means it optimizes for coverage and clarity, not for catching its own mistakes.
 
 ## Invariants
 
