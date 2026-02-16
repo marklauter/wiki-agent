@@ -27,7 +27,7 @@ Every use case (except UC-05, which creates the workspace) begins by resolving w
 
 - **One workspace per repository.** A workspace for a given `owner/repo` either exists or it does not. There is no partial state, no dual config, no overlapping workspaces for the same repo.
 
-- **Clones reflect remote state.** Operations that read or mutate a clone must operate against its latest remote state. Each use case enforces this in its own way -- UC-05 satisfies it trivially (fresh clone), editorial use cases pull before reading, etc.
+- **Repo freshness is the user's responsibility.** The system does not pull or verify that clones are up to date. UC-05 satisfies freshness trivially (fresh clone). All other use cases operate against whatever state the local clone is in. The user is responsible for pulling before running a command if they want to operate against the latest remote state.
 
 - **Scripts own deterministic behavior.** All deterministic operations (git clone, gh API calls, config I/O, filesystem manipulation) belong in `.scripts/`, not inlined in command prompts. Scripts are testable, predictable, and immune to prompt drift. The LLM's role is judgment: interviews, analysis, content authoring.
 
