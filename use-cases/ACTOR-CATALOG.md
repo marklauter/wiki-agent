@@ -38,48 +38,73 @@ UC-07 (Publish Wiki Changes) is out of scope and excluded.
 
 ---
 
-## Agent actors
+## Supporting actors
 
-Agents appear only in the editorial use cases (UC-01 through UC-04). Each agent has a single drive — a behavioral tendency it optimizes for. Drives are not goals; they are what make agents predictable and what reveal where they fall short. When a single drive cannot protect the primary actor's goal, separate agents exist. See [PHILOSOPHY.md](meta/PHILOSOPHY.md), "Drives explain separation."
+Supporting actors appear only in the editorial use cases (UC-01 through UC-04). Each has a single drive — a behavioral tendency it optimizes for. Drives are not goals; they are what make actors predictable and what reveal where they fall short. When a single drive cannot protect the primary actor's goal, separate actors exist. See [PHILOSOPHY.md](meta/PHILOSOPHY.md), "Drives explain separation."
 
-Agents divide into two families defined by their relationship to wiki content — plus two that stand alone.
+Agents divide into three families — orchestrators, assessors, and content mutators — plus the developmental editor, which stands alone.
 
-### Orchestrator
+### «abstract» Orchestrator
 
-- **Drive:** Coordination.
-- **Appears in:** UC-01 (`/init-wiki`), UC-02 (`/proofread-wiki`), UC-03 (`/resolve-issues`), UC-04 (`/refresh-wiki`)
+Resolves the workspace, absorbs editorial context, dispatches other agents, collects results, and presents summaries. The orchestrator makes no editorial judgments — it delegates judgment to specialized agents. The shared mechanics are: workspace resolution, editorial context absorption, agent dispatch, result collection, and summary presentation. Each editorial use case instantiates an orchestrator whose drive determines what it coordinates and how it decides when to advance between phases.
 
-Resolves the workspace, absorbs editorial context, dispatches other agents, collects results, and presents summaries. The orchestrator makes no editorial judgments — it delegates comprehension to explorers, synthesis to the planner, production to creators, critique to reviewers, and remediation to correctors. Each command instantiates an orchestrator for its bounded context.
+#### Commissioning orchestrator
 
-### Planning agent
+- **Drive:** Commissioning.
+- **Appears in:** UC-01 (`/init-wiki`)
+
+Named for the *commissioning editor* in publishing — the person who identifies what content is needed, recruits authors, and shepherds manuscripts from concept to completion. The commissioning orchestrator dispatches researchers to comprehend the source code, feeds their reports to the developmental editor, presents the plan for user approval, and dispatches creators to produce pages.
+
+#### Oversight orchestrator
+
+- **Drive:** Oversight.
+- **Appears in:** UC-02 (`/proofread-wiki`)
+
+Named for the *managing editor* — the person who runs the editorial quality process, assigns reviewers to content, and ensures standards are met across the publication. The oversight orchestrator dispatches researchers for context, dispatches proofreaders across four editorial lenses, collects findings, coordinates deduplication against existing issues, and files GitHub issues.
+
+#### Fulfillment orchestrator
+
+- **Drive:** Fulfillment.
+- **Appears in:** UC-03 (`/resolve-issues`)
+
+Named for the *production editor* — the person who manages the flow of corrections through the production pipeline, ensuring that marked-up proofs are corrected and ready for publication. The fulfillment orchestrator fetches GitHub issues, parses them against the published schema, filters out unapplicable issues, groups actionable issues by wiki page, dispatches correctors, and manages issue lifecycle (closing, commenting, labeling).
+
+#### Alignment orchestrator
+
+- **Drive:** Alignment.
+- **Appears in:** UC-04 (`/refresh-wiki`)
+
+Named for the *revisions editor* in reference publishing — the person who manages the process of updating existing content to reflect new information across editions. The alignment orchestrator identifies recent source code changes as priority context, dispatches fact-checkers across all content pages, collects assessments, dispatches correctors for pages with drift, and compiles the durable sync report.
+
+### Developmental editor
 
 - **Drive:** Synthesis.
 - **Agent type:** `general-purpose`
 - **Appears in:** UC-01
 
-Receives all exploration reports and produces a coherent wiki structure — sections containing pages, each with a filename, title, description, and key source files. Turns raw understanding into a structure that serves the audience. Does not write content; it organizes. The proposed structure requires user approval before any pages are written.
+Named for the *developmental editor* in publishing — the person who shapes a manuscript's structure before writing begins, determining what content is needed, how it should be organized, and what serves the reader. The developmental editor receives all research reports and produces a coherent wiki structure — sections containing pages, each with a filename, title, description, and key source files. Does not write content; it organizes. The proposed structure requires user approval before any pages are written.
 
-The planning agent reads reports and produces structured output like an assessor, but its output is a *plan*, not an *assessment*. Synthesis is categorically different from evaluation — it decides what *should* exist, not whether what exists is correct.
+The developmental editor reads reports and produces structured output like an assessor, but its output is a *plan*, not an *assessment*. Synthesis is categorically different from evaluation — it decides what *should* exist, not whether what exists is correct.
 
 ### «abstract» Assessor
 
 Receives an assignment from the orchestrator. Reads inputs. Applies judgment to produce structured output. **Never modifies wiki content. Never modifies source material.** The read-only constraint is the defining behavioral trait. Each child specializes in what it judges and what vocabulary its output uses, but the protocol with the orchestrator is the same: assignment in, structured assessment out.
 
-#### Explorer agents
+#### Researchers
 
 - **Drive:** Comprehension.
 - **Agent type:** `wiki-explorer`
 - **Appears in:** UC-01, UC-02
 
-Read-only examination of source code from distinct angles or domain facets. Each produces a structured report. In UC-01, reports feed the planning agent. In UC-02, summaries serve as shared context for reviewer agents. Explorers never modify files. The minimum facets in UC-02 are: public API surface, architecture, and configuration. Facet count is extensible per project.
+Named for the *researcher* in publishing — the person who gathers background material, verifies references, and provides raw factual groundwork for writers and editors. Each researcher performs read-only examination of source code from a distinct angle or domain facet and produces a structured report. In UC-01, reports feed the developmental editor. In UC-02, summaries serve as shared context for proofreaders. Researchers never modify files. The minimum facets in UC-02 are: public API surface, architecture, and configuration. Facet count is extensible per project.
 
-#### Reviewer agents
+#### Proofreaders
 
 - **Drive:** Critique.
 - **Agent type:** `wiki-reviewer`
 - **Appears in:** UC-02
 
-Each examines wiki content through one editorial lens. Four lenses represent distinct editorial disciplines:
+Named for the *proofreader* — the person who reads a work against its sources and standards, marking every error for correction without making the corrections themselves. Each proofreader examines wiki content through one editorial lens. Four lenses represent distinct editorial disciplines:
 
 | Lens | Scope | What it checks |
 |------|-------|----------------|
@@ -88,9 +113,9 @@ Each examines wiki content through one editorial lens. Four lenses represent dis
 | Copy | Cross-page | Grammar, formatting, terminology consistency |
 | Accuracy | Per page + source | Claims verified against source code |
 
-A reviewer that finds nothing wrong reports clean content. The drive is to find real problems, not to generate findings.
+A proofreader that finds nothing wrong reports clean content. The drive is to find real problems, not to generate findings.
 
-#### Fact-checker agents
+#### Fact-checkers
 
 - **Drive:** Verification.
 - **Appears in:** UC-04
@@ -99,7 +124,7 @@ Each reads an assigned wiki page, identifies all sources of truth (source code f
 
 The fact-checker's scope includes external references (URLs, linked docs, specifications) as sources of truth. This is broader than UC-02's accuracy lens, which is strictly source-code-grounded.
 
-#### Deduplicator agent
+#### Deduplicator
 
 - **Drive:** Filtering.
 - **Appears in:** UC-02
@@ -117,17 +142,17 @@ Receives a page assignment with source file references from the orchestrator. Re
 | Authority | Self (constrained by plan) | The finding (constrained by source) |
 | On uncertainty | Must produce something | Must skip |
 
-**Separation rationale:** An agent that both produces content and evaluates whether it produced well has two jobs and will do both poorly. Two agents with opposing drives produce better outcomes than one agent balancing competing concerns. Production, critique, and remediation are three distinct drives — a creator cannot reliably evaluate its own output, and a corrector must not second-guess the reviewer or generate new content.
+**Separation rationale:** An actor that both produces content and evaluates whether it produced well has two jobs and will do both poorly. Two actors with opposing drives produce better outcomes than one balancing competing concerns. Production, critique, and remediation are three distinct drives — a creator cannot reliably evaluate its own output, and a corrector must not second-guess the proofreader or generate new content.
 
-#### Writer agents (Creator)
+#### Creators
 
 - **Drive:** Production.
 - **Agent type:** `wiki-writer`
 - **Appears in:** UC-01
 
-Each receives a page assignment with source file references, audience, tone, and editorial guidance, then reads the source files and writes one wiki page. The writer optimizes for coverage and clarity, not for catching its own mistakes. This drive is insufficient to guarantee accuracy — which is why UC-02 exists with a separate critique drive.
+Named for the *staff writer* in publishing — the person who produces original content from source material and editorial direction. Each creator receives a page assignment with source file references, audience, tone, and editorial guidance, then reads the source files and writes one wiki page. The creator optimizes for coverage and clarity, not for catching its own mistakes. This drive is insufficient to guarantee accuracy — which is why UC-02 exists with a separate critique drive.
 
-#### Corrector agents
+#### Correctors
 
 - **Drive:** Remediation.
 - **Agent type:** `wiki-writer` (reused)
@@ -166,16 +191,20 @@ Git provides repository cloning, change detection, and the post-hoc approval gat
 | Actor | Goal / Drive | UC-01 | UC-02 | UC-03 | UC-04 | UC-05 | UC-06 |
 |-------|--------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | User | (goal per UC) | P | P | P | P | P | P |
-| Orchestrator | Coordination | S | S | S | S | — | — |
-| Planning agent | Synthesis | S | — | — | — | — | — |
+| *«Orchestrator»* | *coordination* | *S* | *S* | *S* | *S* | — | — |
+| ↳ Commissioning orchestrator | Commissioning | S | — | — | — | — | — |
+| ↳ Oversight orchestrator | Oversight | — | S | — | — | — | — |
+| ↳ Fulfillment orchestrator | Fulfillment | — | — | S | — | — | — |
+| ↳ Alignment orchestrator | Alignment | — | — | — | S | — | — |
+| Developmental editor | Synthesis | S | — | — | — | — | — |
 | *«Assessor»* | *read-only judgment* | *S* | *S* | — | *S* | — | — |
-| ↳ Explorer agents | Comprehension | S | S | — | — | — | — |
-| ↳ Reviewer agents | Critique | — | S | — | — | — | — |
-| ↳ Fact-checker agents | Verification | — | — | — | S | — | — |
+| ↳ Researchers | Comprehension | S | S | — | — | — | — |
+| ↳ Proofreaders | Critique | — | S | — | — | — | — |
+| ↳ Fact-checkers | Verification | — | — | — | S | — | — |
 | ↳ Deduplicator | Filtering | — | S | — | — | — | — |
 | *«Content Mutator»* | *wiki modification* | *S* | — | *S* | *S* | — | — |
-| ↳ Writer agents | Production | S | — | — | — | — | — |
-| ↳ Corrector agents | Remediation | — | — | S | S | — | — |
+| ↳ Creators | Production | S | — | — | — | — | — |
+| ↳ Correctors | Remediation | — | — | S | S | — | — |
 
 **P** = primary actor, **S** = supporting actor, **—** = not involved, *italics* = abstract (not instantiated directly)
 
