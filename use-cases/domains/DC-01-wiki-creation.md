@@ -8,7 +8,7 @@ Owns the transition from an empty wiki to a populated wiki. The source code is e
 
 - **Exploration report** -- A structured summary of one facet of the source code (API surface, architecture, configuration), produced by a researcher.
 - **Wiki plan** -- A hierarchical structure of sections containing pages, each with filename, title, description, and key source files. Proposed by the developmental editor, refined and approved by the user.
-- **Writer assignment** -- The input to a creator: page file path, title, description, key source files, audience, tone, and editorial guidance.
+- **Writing assignment** -- The input to a creator: page file path, title, description, key source files, audience, tone, and editorial guidance.
 
 ## Use cases
 

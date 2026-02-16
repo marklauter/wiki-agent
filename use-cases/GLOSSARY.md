@@ -124,4 +124,4 @@ Each entry is one sentence. If a term needs a paragraph, it belongs in [PHILOSOP
 
 **Workspace selection** -- The shared protocol every use case (except UC-05) executes to resolve which workspace to operate on; implemented by `resolve-workspace.sh`.
 
-**Writer assignment** -- The input to a creator in UC-01: page file path, title, description, key source files, audience, tone, and editorial guidance.
+**Writing assignment** -- The input to a creator in UC-01: page file path, title, description, key source files, audience, tone, and editorial guidance.
