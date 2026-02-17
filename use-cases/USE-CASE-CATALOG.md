@@ -23,7 +23,7 @@ The domain decomposes into six **bounded contexts**, each with its own ubiquitou
 - **[DC-05 Workspace Lifecycle](domains/DC-05-workspace-lifecycle.md)** -- provisioning and decommissioning of project workspaces.
 - **[DC-06 Wiki Restructuring](domains/DC-06-wiki-restructuring.md)** -- interactive restructuring of an existing wiki *(not yet designed)*.
 
-The **published language** between Editorial Review and Issue Resolution is the GitHub issue body conforming to the `wiki-docs.yml` template schema. This is the integration contract -- UC-02 produces issues in this format, UC-03 consumes them. No internal state is shared across the boundary.
+The **published language** between Editorial Review and Issue Resolution is the GitHub issue body conforming to the `documentation-issue.md` template schema. This is the integration contract -- UC-02 produces issues in this format, UC-03 consumes them. No internal state is shared across the boundary.
 
 Actors have **drives** -- behavioral tendencies that determine what each actor optimizes for (see [PHILOSOPHY.md](meta/PHILOSOPHY.md)). A creator's drive is production. A proofreader's drive is critique. A fact-checker's drive is verification. Where a single drive is insufficient to protect a concern, a separate actor with a complementary drive is introduced. This is the domain's answer to conflicts of interest: structural separation, not trust.
 
@@ -35,7 +35,7 @@ Supporting documents: [PHILOSOPHY.md](meta/PHILOSOPHY.md) (design principles), [
 - **[UC-02](UC-02-review-wiki-quality.md)** -- Review wiki quality across four editorial lenses, file GitHub issues
 - **[UC-03](UC-03-resolve-documentation-issues.md)** -- Apply recommended corrections from GitHub issues to wiki pages
 - **[UC-04](UC-04-sync-wiki-with-source-changes.md)** -- Fact-check wiki claims against source code and external references, correct drift
-- **[UC-05](UC-05-provision-workspace.md)** -- Clone repos and write config for a new project workspace
+- **[UC-05](UC-05-provision-workspace.md)** -- Clone repos and write config for a new project workspace *(complete)*
 - **[UC-06](UC-06-decommission-workspace.md)** -- Remove a project workspace with safety checks for unpublished work
 - **[UC-07](UC-07-publish-wiki-changes.md)** -- Commit and push wiki changes *(out of scope -- users use their own git tools)*
 - **[UC-08](UC-08-refactor-existing-wiki.md)** -- Interactively restructure an existing wiki *(not yet designed)*

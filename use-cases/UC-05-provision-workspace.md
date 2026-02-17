@@ -26,8 +26,8 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 
 - Source repository is cloned into `workspace/{owner}/{repo}/` as a readonly reference.
 - Wiki repository is cloned into `workspace/{owner}/{repo}.wiki/`.
-- `workspace/config/{owner}/{repo}/workspace.config.yml` is written with repo identity, paths, audience, and tone.
-- The user sees a summary of what was provisioned: repo identity, paths, and config values.
+- `workspace/artifacts/{owner}/{repo}/workspace.config.md` is written with repo identity, paths, audience, and tone.
+- The user sees a summary of what was provisioned: repo identity, clone paths, config values (audience, tone), and suggested next steps (run `/init-wiki` to populate the wiki).
 
 ## Failure outcome
 
@@ -47,7 +47,7 @@ See also: [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md) for cross-cutting invaria
 8. **System** -- Clones the wiki repository into the workspace.
 9. **System** -- Writes the workspace configuration file.
    --> WorkspaceProvisioned
-10. **User** -- Sees a summary of the provisioned workspace: repo identity, paths, and config values.
+10. **User** -- Sees a summary of the provisioned workspace: repo identity, clone paths, config values (audience, tone), and suggested next steps (run `/init-wiki` to populate the wiki).
 
 ## Goal obstacles
 
@@ -94,14 +94,13 @@ See [DOMAIN-EVENTS.md](domains/DOMAIN-EVENTS.md) for full definitions.
 
 ## Protocols
 
-- **workspace.config.yml** -- step 9, the output artifact of provisioning. This file is the contract between Workspace Lifecycle and all other bounded contexts. Its schema (repo, sourceDir, wikiDir, audience, tone) is consumed by the workspace selection procedure that every downstream command executes before operating.
+- **workspace.config.md** -- step 9, the output artifact of provisioning. This file is the contract between Workspace Lifecycle and all other bounded contexts. Its schema (repo, sourceDir, wikiDir, audience, tone) is consumed by the workspace selection procedure that every downstream command executes before operating.
 
 ## Notes
 
 - **Validate before cloning.** The system verifies both the source repo and wiki repo exist on GitHub before attempting any clones. This provides clear, actionable error messages and enables the wait-and-retry flow for wiki creation.
 - **Context absorption belongs to the editorial domain.** Reading the target project's CLAUDE.md and the wiki's `_Sidebar.md` is an editorial concern (UC-01, UC-02, UC-04), not a workspace lifecycle concern. Provisioning does not read or present project content.
-- **Scripts own deterministic behavior.** (See [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md).) The clone script (`clone-workspace.sh`) is the single source of truth for provisioning mechanics. The `/up` command should delegate to it after collecting user inputs.
-- **Implementation gap: command vs. script reconciliation.** The `/up` command file and `clone-workspace.sh` currently implement the same logic independently. The command file writes config before cloning; the script clones first then writes config. The script's ordering is safer (no orphaned config on clone failure). This use case follows the script's ordering and the command should be updated to delegate to the script.
+- **Scripts own deterministic behavior.** (See [SHARED-INVARIANTS.md](SHARED-INVARIANTS.md).) The provisioning script (`provision-workspace.sh`) is the single source of truth for provisioning mechanics. The `/up` command delegates to it after collecting user inputs.
 - **Audience and tone are immutable.** There is currently no edit path for these values. Changing them requires `/down` then `/up`.
 - **Implementation: repository identification.** Step 3 extracts the owner and repository name by parsing the clone URL (supports both HTTPS and SSH formats).
 - **Relationship to other use cases:** UC-05 is a prerequisite for UC-01 (Populate New Wiki), UC-02 (Review Wiki Quality), UC-03 (Resolve Documentation Issues), and UC-04 (Sync Wiki with Source Changes). UC-06 (Decommission Workspace) is its inverse. UC-07 (Publish Wiki Changes) is out of scope -- users commit and push using their own git tools.
