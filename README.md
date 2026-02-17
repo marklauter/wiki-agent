@@ -10,6 +10,8 @@ GitHub wikis have no CI, no review workflow, and drift from source code over tim
 
 Wiki-agent generates and maintains GitHub wiki pages from your source code. It runs as a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) workspace. You open this project, tell it which repo you're working on, and it clones the source and wiki repos into a local `workspace/` directory. All commands operate against whatever project is currently loaded.
 
+Wiki-agent never commits or pushes to git. Every command writes to local files only — you review changes with `git diff`, commit when you're satisfied, and push when you're ready. Nothing reaches GitHub until you decide it should. Source repositories are cloned as readonly references and are never modified.
+
 Multiple projects can be loaded at the same time. Run `/up` again to add another project. Nothing is permanent — cloned repos and configs are gitignored. Run `/down` to clean up a workspace when you no longer need it.
 
 ### Workspace layout
