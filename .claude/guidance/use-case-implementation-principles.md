@@ -1,4 +1,4 @@
-# Agent creation principles
+# Use Case Implementation Principles
 
 Guiding principles for implementing agents in this project. Every agent definition must reflect these ideas. This document bridges the use case model (see `use-cases/meta/PHILOSOPHY.md`) to Claude Code's extension layer.
 
